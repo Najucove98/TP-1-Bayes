@@ -1,0 +1,1107 @@
+---
+title: ""
+author: ""
+date: ""
+output:
+  bookdown::pdf_document2:
+    latex_engine: xelatex
+    toc: false
+    number_sections: false
+    keep_tex: true
+header-includes:
+  - \renewcommand{\figurename}{Figura}
+  - \renewcommand{\tablename}{Tabla}
+  - \usepackage{float}
+  - \floatplacement{figure}{H}
+  - \usepackage{titling}
+  - \usepackage{lipsum}
+  - \usepackage{fancyhdr}
+  - \usepackage{etoolbox}
+  - \usepackage{setspace}
+  - \usepackage{titlesec}
+  - \usepackage{emptypage}
+  - \pagestyle{fancy}
+  - \usepackage{placeins}
+  - \fancyhf{}
+  - \patchcmd{\maketitle}{\@maketitle}{\centering\vspace*{6cm}\@maketitle}{}{}
+  - \thispagestyle{empty}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{=tex}
+\begin{titlepage}
+\centering
+\vspace*{4cm} % espacio superior
+
+{\Huge \textbf{Trabajo práctico 1 Estadística Bayesiana}}\\[2cm]
+
+{\Large Agustina Roura}\\[0.5cm]
+{\Large Cristian Nahuel Coveñas}\\[0.5cm]
+{\Large Juan Sebastian Reines}\\[2cm]
+
+{\large Fecha: Abril 2025}
+
+\vfill
+
+\end{titlepage}
+```
+\newpage
+
+## Introducción
+
+Las apuestas en línea han ganado una creciente popularidad entre los
+adolescentes, impulsadas por la accesibilidad de plataformás digitales y
+la constante exposición a la publicidad en redes sociales y eventos
+deportivos. Donde en un principio se plantean que tienen el "control"
+cuando la realidad termina siendo mucho más complejas, cuando se quedan
+enredados en una nube de rachas ganadoras y cuando empiezan a perder
+dinero siguen en el juego con la esperanza de recuperar.
+
+Además de esto el poder realizar estudios sobre el tema es complejo,
+porque a muchos adolescentes les causa verguenza el admitir que
+practican dichos juegos; por lo tanto se crearon diversos métodos de
+encuesta para reducir los sesgos por la mentira que pueden proporciónar
+los usuarios o por el simple hecho de no querer responder, en este
+trabajo se podran ver reflejados dos de estos métodos, como funciónan y
+el análisis correspondiente con cada uno de los métodos.
+
+\newpage
+
+## Indice
+
+1.[**Análisis de estudio considerando la mentira al responder las
+preguntas**](#Objetivo-1)
+
+2.[**Análisis de los apostadores utilizando el método de
+Warner**](#Objetivo-2)
+
+3.[**Análisis de los apostadores utilizando el método de
+Greenberg**](#Objetivo-3)
+
+4.[**Conclusiones finales sobre los métodos de respuesta
+aleatorizada**](#Objetivo-4)
+
+\newpage
+
+### Análisis de estudio considerando la mentira al responder las preguntas {#Objetivo-1}
+
+Se sabe que este es un tema que en muchos alumnos puede llegar a ser un
+tema de verguenza porque algunos han llegado a perder mucho dinero, por
+lo que muy posiblemente al hacerles la pregunta "¿Haz apostado en algun
+momento?" posiblemente no sean honestos al responder.
+
+Entonces entrando en materia del estudio se propone un modelo bayesiano,
+ya que se busca saber si el alumno miente en la pregunta dado que ya se
+sabe la respuesta y la probabilidad(p) con la que le toque la pregunta,
+para esto se toma la información obtenida $(Prior)$ y la que se piensa
+que puede ser para llegar a una conclusion $(Likelihood)$ que hace
+combinar la información obtenida junto con la supuesta $(Posterior)$.
+
+```{r echo=FALSE, fig.height=300, fig.width=400, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(sampling)
+library(tidyverse)
+library(patchwork)
+library(ggplot2)
+library(patchwork)
+library(tibble)
+
+# Semilla para control de repeticiones
+set.seed(1998)
+
+# Poblacion de tamaño N = 1000 para muestras de tamaño n = 100
+N <- 1000
+apuesta <- c(rep(1, 400), rep(0, 600))
+
+# Data frame de la poblacion
+poblacion <- data.frame(estudiante = seq(1:N), apuesta = sample(apuesta) )
+
+```
+
+### Modelo bayesiano Beta-Binomial
+
+-   $\pi_a$: Proporción de estudiantes de una escuela que participan de
+    apuestas deportivas en línea.
+
+-   $n$: Cantidad de estudiantes en la muestra.
+
+-   $y$: Número de estudiantes que apuestan.
+
+#### Prior:
+
+Se empieza con la creencia inicial de como se distribuye la proporción
+de que los alumnos de la escuela participan en apuestas deportivas
+$$ \pi_a \sim Beta(a = 1, b = 1) $$
+
+```{=latex}
+\FloatBarrier
+```
+```{r,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 4, warning=FALSE}
+
+colores <- c("#f08533", "#3b78b0", "#d1352c" , "#44A699")
+pi_grid <- seq(0, 1, length.out = 200)
+
+# Obtener prior
+prior <- dbeta(pi_grid, 1, 1)
+
+
+# Graficar prior
+plt_prior <- data.frame(x = pi_grid, y = prior) |>
+  ggplot() +
+  geom_line(aes(x = x, y = y), color = colores[1], linewidth = 1) +
+  ggtitle("Prior") +
+  labs(
+    x = expression(pi),
+    y = expression(p ~ "(" ~ pi ~ ")")
+  ) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank())
+
+```
+
+#### Likelihood(función de verosimilitud):
+
+Esto es como se cree que se deberia ver el comportamiento de la variable
+$Y_i$ en donde se piensa que la proporción de estudiantes que apuestan
+es del 40% $$ Y_i/\pi_a \sim Bi(n , \pi_a) $$
+
+```{=latex}
+\FloatBarrier
+```
+```{r,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 4, warning=FALSE}
+# Creaciones de las muestra de tamaño n = 100
+
+muestra <- data.frame(apuesta = sample(poblacion$apuesta, 100, replace = T))
+
+n <- length(muestra$apuesta)
+apuestan <- sum(muestra)
+
+# n = 100
+# apuestan = 40
+# Calcular verosimilitud para cada valor de "pi"
+likelihood <- dbinom(apuestan, n, pi_grid)
+
+# Graficar verosimilitud
+plt_likelihood <- data.frame(x = pi_grid, y = likelihood) |>
+  ggplot() +
+  geom_line(aes(x = x, y = y), color = colores[2], linewidth = 1) +
+  ggtitle("Likelihood") +
+  labs(
+    x = expression(pi),
+    y = expression(p ~ "(y | " ~ pi ~ ")")
+  ) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank())
+
+```
+
+#### Posterior:
+
+La combinación de la creencia inicial y el comportamiento pensado de la
+variable de interés $$ p(\pi_a/y) \propto p(y/\pi_a).p(\pi_a) $$
+
+```{r fig1, echo = FALSE, fig.width=10, fig.height=3, fig.cap="Función de dispersión"}
+# Obtener posterior
+posterior <- dbeta(pi_grid, 1 + apuestan, 1 + n - apuestan)
+
+# Graficar posterior
+plt_posterior <- data.frame(x = pi_grid, y = posterior) |>
+  ggplot() +
+  geom_line(aes(x = x, y = y), color = colores[3], linewidth = 1) +
+  labs(
+    x = expression(pi),
+    y = expression(p ~ "(" ~ pi ~ " | y)")
+  ) +
+  ggtitle("Posterior") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank())
+
+# Concatenar graficos
+plt_prior | plt_likelihood | plt_posterior
+
+```
+
+Partiendo de este gráfico se puede ver como el $Likelihood$ influye
+mucho en la respuesta final, ya que la creencia inicial era la
+incertidumbre total (cualquier valor tiene una misma probabilidad) que
+en este caso de estudio seria que la probabilidad de la proporción de
+estudiantes que apuestan en la escuela es la misma para cualquier valor
+de la proporción, es decir, la probabilidad de que la proporción de
+estudiantes que apueste sea del 50% es la misma a la del 1%.
+
+### Niveles de mentira de los estudiantes
+
+Si se toma en cuenta de que hay una probabilidad de que los estudiantes
+mientan, se simula muestras de estudiantes con distintos niveles de
+mentira bajo, medio y alto; para poder ver el comportamiento de la
+variable de interés con cada nivel de mentira
+
+```{=latex}
+\FloatBarrier
+```
+```{r,echo=FALSE, fig.align = "center", warning=FALSE, fig.width = 7, fig.height = 3.2}
+set.seed(1998)
+
+#Muestra base para los 6 procedimientos
+apuesta_b <- sample(poblacion$apuesta, n, replace = T)
+
+
+
+#Procedimiento sin mentira, con mentira de nivel mu (bajo, medio ,alto)
+muestra_mu <- function(mu, a_prior, b_prior, apuesta_b){
+  muestras <- list()
+  post_m <- list()
+  
+  for(i in 1:length(mu)) {
+    muestra <- data.frame(apuesta =  ifelse(apuesta_b == 1 ,ifelse(runif(sum(apuesta_b)) < mu[i], 0 ,1),0))
+    muestras[[length(muestras) + 1]] <- muestra$apuesta
+    post_m[[length(post_m) + 1]] <- dbeta(pi_grid, a_prior + sum(muestra$apuesta), b_prior + n - sum(muestra$apuesta) )
+  }
+  return(post_m)
+}
+
+#Guardo la lista que devuelve la función para poder graficar
+post_mu <- muestra_mu(c(0, 0.3, 0.45, 0.8), 1, 1, apuesta_b)
+
+# Crear un data.frame
+datos <- data.frame(
+  p = rep(pi_grid, times = 4),
+  posterior = c(post_mu[[1]], post_mu[[2]], post_mu[[3]], post_mu[[4]]),
+  Mentira = rep(c("Miente μ = 0","Miente μ = 0.3", "Miente μ = 0.45", "Miente μ = 0.8"), each = 200))
+
+# Crear el grafico con ggplot2 con los siguientes mapeos
+ggplot(datos, aes(x = p, y = posterior, color = Mentira)) +
+  geom_line() +
+  geom_area(aes(fill = Mentira), alpha = 0.4, position = "identity") +
+  ggtitle("Posterior") +
+  scale_color_manual(values = colores) +
+  scale_fill_manual(values = colores) +
+  labs(x = expression(pi), y = expression("p(" ~ pi ~ "| y)")) +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+  )
+
+```
+
+A medida que aumenta la probabilidad asociada a los distintos valores de
+$\mu$, se observa que la variabilidad de las distribuciones a posteriori
+disminuye a medida que incrementa el nivel de mentira. Sin embargo,
+dichas distribuciones tienden a centrarse en un valor sesgado del
+parámetro de interés $\pi$.
+
+### Aumento de la cantidad de simulaciones
+
+Para poder tener unos resultados con más plausibilidad, se piensa en
+realizar 1000 simulaciones de los diferentes niveles de mentira y hacer
+su respectiva inferencia a cada nivel.
+
+```{r ,echo=FALSE, fig.align = "center", warning=FALSE, fig.width=4.5, fig.height=3.2}
+set.seed(1998)
+
+int_m_0 <- matrix(NA, nrow = 1000, ncol = 2)
+int_m_1 <- matrix(NA, nrow = 1000, ncol = 2)
+int_m_2 <- matrix(NA, nrow = 1000, ncol = 2)
+int_m_3 <- matrix(NA, nrow = 1000, ncol = 2)
+
+for (i in 1:1000) {
+  ma_0 <- data.frame(alumno = 1:n, apuesta = sample(poblacion$apuesta, 100, replace = T))
+  
+  apuesta_1 <- sample(poblacion$apuesta, 100, replace = T)
+  
+  ma_1 <- data.frame(alumno = 1:n, apuesta =  ifelse(apuesta_1 == 1 ,ifelse(runif(sum(apuesta_1)) < 0.3, 0 ,1),0))
+  
+  apuesta_2 <- sample(poblacion$apuesta, 100, replace = T)
+  
+  ma_2 <- data.frame(alumno = 1:n, apuesta =  ifelse(apuesta_2 == 1 ,ifelse(runif(sum(apuesta_2)) < 0.45, 0 ,1),0))
+  
+  apuesta_3 <- sample(poblacion$apuesta, 100, replace = T)
+  
+  ma_3 <- data.frame(alumno = 1:n, apuesta =  ifelse(apuesta_3 == 1 ,ifelse(runif(sum(apuesta_3)) < 0.8, 0 ,1),0))
+  
+  int_m_0[i, ] <- qbeta(c(0.025, 0.975), 1 + sum(ma_0$apuesta), 1 + n - sum(ma_0$apuesta))
+  int_m_1[i, ] <- qbeta(c(0.025, 0.975), 1 + sum(ma_1$apuesta), 1 + n - sum(ma_1$apuesta))
+  int_m_2[i, ] <- qbeta(c(0.025, 0.975), 1 + sum(ma_2$apuesta), 1 + n - sum(ma_2$apuesta))
+  int_m_3[i, ] <- qbeta(c(0.025, 0.975), 1 + sum(ma_3$apuesta), 1 + n - sum(ma_3$apuesta))
+}
+
+# Ver cuántos intervalos cubren el valor 0.4
+cubre_0 <- (int_m_0[,1] <= 0.4) & (int_m_0[,2] >= 0.4)
+cubre_1 <- (int_m_1[,1] <= 0.4) & (int_m_1[,2] >= 0.4)
+cubre_2 <- (int_m_2[,1] <= 0.4) & (int_m_2[,2] >= 0.4)
+cubre_3 <- (int_m_3[,1] <= 0.4) & (int_m_3[,2] >= 0.4)
+
+# Proporción de intervalos que lo cubren
+Niv_mentira <- tibble(
+  Método = c("μ = 0", "μ = 0.3", "μ = 0.45", "μ = 0.8"),
+  Cobertura = c(mean(cubre_0), mean(cubre_1), mean(cubre_2), mean(cubre_3))
+  )
+
+ggplot(Niv_mentira, aes(x = reorder(Método, Cobertura), y = Cobertura)) +
+  geom_col(fill = colores, alpha = 0.65) +
+  geom_text(aes(label = round(Cobertura, 3)), vjust = -0.5, size = 4) +
+  labs(
+    title = expression("Comparación entre los niveles de " * mu),
+    subtitle = "Cobertura de intervalos del 90%",
+    x = "Nivel de mentira",
+    y = "Cobertura"
+  ) +
+  ylim(0, 1) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+
+
+```
+
+En este procedimiento se realizan intervalos de credibilidad para todos
+los niveles de mentira que se propusieron, en donde segun el nivel de
+mentira, el comportamiento para las muestras tomadas no incluyen el
+valor verdadero de la proporción de alumnos que hacen apuestas online.
+
+Como se puede ver en el gráfico, si los estudiantes no mienten, los
+intervalos de credibilidad cubren el verdadero valor de la proporción de
+estudiantes que apuestan en un 95.9%, sin embargo si se ve cuando los
+estudiantes tienen una probabilidad de mentir de 0.45 los intervalos de
+credibilidad cubren el verdadero valor de la proporción de estudiantes
+que apuestan desciende a 3.8% lo cual significa que es una muestra que
+no provee de información util y veraz para el análisis del estudio.
+
+```{=latex}
+\clearpage
+```
+## Método de Warner {#Objetivo-2}
+
+Este es un método de aleatorización, en el cual se le hace la pregunta a
+el estudiante con probabilidad $p$ "¿Alguna vez participaste de apuestas
+deportivas?" y con probabilidad $(1 - p)$ "¿Nunca ha participado en
+apuestas deportivas?"
+
+Esta estrategia permite preservar la privacidad del encuentado y obtener
+una estimación de $\pi_a$.
+
+### Responder Si o No
+
+A continuación se va a utilizar el método de Warner para calcular la
+probabilidad de que un estudiante responda afirmativamente, cualquiera
+sea la pregunta y tambien la probabilidad de que un estudiante responda
+negativamente, cualquiera sea la pregunta.
+
+-   $y \text{ = } \text{El estudiante responde afirmativamente. } P(y) = \lambda_W$
+
+-   $\lambda_W$ = Probabilidad de que un estudiante responda
+    afirmativamente
+
+-   $1 - \lambda_W$ = Probabilidad de que un estudiante no responda
+    afirmativamente
+
+-   $Q \text{ = } \text{Pregunta 1 (¿participas en apuestas en linea?). } P(Q)=p \ conocido$
+
+-   $Q^c \text{ = } \text{Pregunta 2 (¿no participas en apuestas en linea?). } P(Q^c)=(1-p) \ conocido$
+
+Para la probabilidad de que un estudiante responda afirmativamente,
+tomamos el método de probabilidad total
+$$ \lambda_W = P(y) = P(y,Q) + P(y,Q^c)$$
+$$\\ = P(\text{y} \mid Q) \cdot P(Q) + P(\text{y} \mid Q^c) \cdot P(Q^c) $$
+$$\\= \pi_A \cdot p + (1 - \pi_A) \cdot (1 - p)$$
+
+Para la probabilidad de que un estudiante responda de forma negativa
+$$ 1 - \lambda_W = P(y^c) = P(y^c,Q) + P(y^c,Q^c)$$
+$$\\ = P(y^c \mid Q) \cdot P(Q) + P(y^c \mid Q^c) \cdot P(Q^c) $$
+$$\\= (1 - \pi) \cdot p + \pi \cdot (1 - p)$$
+
+### Formalizando el modelo
+
+Se empieza a formalizar cada parte del modelo con sus respectivas
+variables a utilizar, para continuar con un análisis de forma ordenada y
+fluida
+
+Modelo razonable
+
+-   $y$: El estudiante responde afirmativamente
+
+-   $\pi_a$: Proporción de estudiantes que apuestan
+
+$$\text{Distribución del Prior}$$ $$\pi_a \ \sim \ Beta(a = 1, b = 1)$$
+$$\text{Distribución del Likelihood}$$
+$$y \text{| }\pi_a \sim \text{Bin}(n,\lambda_W), \text{ con } \lambda_W \text{ función de } \pi_a$$
+
+### Planteo a partir de un Prior con distribución Uniforme
+
+Se realiza todo el procedimiento matemático correspondiente para la
+utilización de un $Prior$ con una distribución uniforme para llegar a un
+$Posterior$ exacto
+
+$$\pi_a \sim \text{Beta}(1,1)$$
+$$y \mid \pi_a \sim \text{Bin}(n, \lambda_W),\text{ con } \lambda_W \text{ función de } \pi_a\\$$
+$$P(\pi_a \mid y) = \dfrac{P(y \mid \pi_a) \cdot P(\pi_a)}{P(y)} \quad \text{Por regla de Bayes}$$
+$$P(\pi_a \mid y) = \dfrac{\lambda^y (1 - \lambda)^{N - y}}{\int \lambda^y (1 - \lambda)^{N - y} \, d\lambda}\\$$
+$$P(\pi_a \mid y) = \dfrac{[\pi_a p + (1 - \pi_a)(1 - p)]^y [1 - \pi_a p + (1 - \pi_a)(1 - p)]^{N - y} (1 - 2p)}{\int B(1 - p; y + 1; N - y + 1) - B(p; y + 1; N - y + 1)}\\$$
+
+### Visualización de Posterior
+
+Para sumar a el análisis se hacen graficos de los $Posterior$ utilizando
+distintos valores de $p$, por lo que se simulan distintas muestras para
+poder ver el comportamiento en cada $p$ propuesto
+
+```{r,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 3.5, warning=FALSE}
+set.seed(1998)
+
+#método warner
+#Definimos una función para evaluar distintos caso de p con un prior uniforme
+muestra_war <- function(p, apuesta_b){
+  # Hacemos función para lambda_w
+  lambda_w <- function(p, pi_a = 0.4){return(pi_a*p + (1-p)*(1-pi_a))}
+  
+  # Lista para guardar los resultados
+  resultados_w <- list()
+  
+  #lista para guardar posterior warner
+  posterior_w <- list()
+  
+  y <- numeric(4)
+  for (i in 1:length(p)) {
+    # Generar la pregunta con p unos y el resto ceros
+    pregunta <- sample(c(rep(1, (p[i]*100)), rep(0, n - (p[i]*100))), n, replace = TRUE)
+    
+    # Generar la respuesta según la lógica dada
+    respuesta <- ifelse(pregunta == 0, ifelse(apuesta_b == 1, 0, 1), apuesta_b)
+    
+    # Crear el tibble para este p y agregarlo a la lista
+    resultados_w[[length(resultados_w) + 1]] <- tibble(muestra_base = apuesta_b,
+                                                       pregunta = pregunta,
+                                                       respuesta = respuesta,
+                                                       p_valor = p[i])
+    
+    #convierto a data frame
+    datos_w <- as.data.frame(resultados_w[[i]])
+    
+    # Hacer el posterior exacto a partir de la muestra
+    y[i] <- sum(datos_w$respuesta)
+    # Establecemos el numerador donde lambda toma valores para p y posibles val de pi
+    num_w <- (lambda_w(p[i], pi_grid) ^ y[i])*((1-lambda_w(p[i], pi_grid)) ^ (n - y[i]))* (1 - 2 * p[i])
+    
+    # paso 5: denominador que salio de consulta
+    denom_w <- (pbeta(1 - p[i], y[i] + 1, n - y[i] + 1) * beta(y[i] + 1, n - y[i] + 1)) - (pbeta(p[i] ,y[i] +1,n-y[i] +1)*beta(y[i] +1, n-y[i] +1))
+    
+    # paso 6: posterior
+    posterior_w[[length(posterior_w) + 1]] <- num_w / denom_w
+    
+  }
+  return(posterior_w)
+}
+posterior_w <- muestra_war(c(0.3, 0.45, 0.6, 0.75), apuesta_b)
+
+# Crear un data.frame
+datos <- data.frame(
+  p = rep(pi_grid, times = 4),
+  posterior = c(posterior_w[[1]], posterior_w[[2]], posterior_w[[3]], posterior_w[[4]]),
+  Niveles = rep(c("p = 0.3","p = 0.45", "p = 0.6", "p = 0.75"), each = 200))
+
+# Crear el grafico con ggplot2 con los siguientes mapeos
+ggplot(datos, aes(x = p, y = posterior, color = Niveles)) +
+  geom_line() +
+  geom_area(aes(fill = Niveles), alpha = 0.4, position = "identity") +
+  ggtitle("Posterior") +
+  scale_color_manual(values = colores) +
+  scale_fill_manual(values = colores) +
+  labs(x = expression(pi), y = expression("p(" ~ pi ~ "| y)")) +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+  )
+
+
+
+```
+
+A partir de la simulación del método de Warner utilizando distintos
+valores de $p$, se observa que el comportamiento de las distribuciones a
+posteriori varía notablemente según el nivel de $p$ utilizado. En
+particular, cuando se utilizan valores extremos de $p$, las
+distribuciones a posteriori tienden a concentrarse en torno al verdadero
+valor de $\pi$, presentando menor variabilidad. Esto indica que, en
+estos casos, la información proporciónada por la muestra es más
+determinante para actualizar la creencia sobre el parámetro de interés.
+
+Por otro lado, para valores intermedios de $p$, las distribuciones
+resultan más dispersas, reflejando una mayor incertidumbre en la
+estimación de $\pi$. En resumen, el valor de $p$ influye directamente en
+la precisión y sesgo de las distribuciones a posteriori, lo cual debe
+ser cuidadosamente considerado al momento de implementar este tipo de
+técnicas en estudios empíricos.
+
+### ¿Y si la población cambia?
+
+Esto es un aspecto muy importante a tener en cuenta, hasta el momento
+todo el análisis se ha partido teniendo una población con un valor de
+$\pi$ definido, si cambiamos esto seguramente cambiaran nuestras
+inferencias y con estas nuestras conclusiones por lo que el siguiente
+paso a realizar es cambiar este $\pi = 0.4$
+
+```{r,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 4, warning=FALSE}
+set.seed(2198)
+
+# Poblacion de tamaño N = 1000 para muestras de tamaño n = 100
+N <- 1000
+
+# paso 1: establecemos los diferentes p
+p <- c(0.3, 0.45, 0.6, 0.75)
+
+# paso 2: hacemos función para lambda 
+lambda <- function(p, pi_a = 0.4){
+return(pi_a*p + (1-p)*(1-pi_a))
+}
+
+graficos_post <- list()
+
+# Establece tamano muestra
+n <- 100
+
+# Establece las diferentes posiciones
+pos <- c(30, 45, 60, 80)
+
+pi_pos <- c(200, 400, 600, 800)
+
+pi_line <- c(0.2, 0.4, 0.6, 0.8)
+line <- 0
+
+for (j in pi_pos) {
+  line <- line + 1
+  apuesta_pi <- c(rep(1, j), rep(0, N - j))
+  # Data frame de la poblacion
+  poblacion_pi <- data.frame(estudiante = seq(1:N), apuesta = sample(apuesta_pi) )
+
+  # Establece la muestra base que parte desde la poblacion
+  muestra_base_pi <- sample(poblacion_pi$apuesta, n, replace = TRUE)
+
+  # Lista para guardar los resultados
+  resultados <- list()
+
+  for (i in pos) {
+    # Generar la pregunta con p unos y el resto ceros
+    apuesta <- c(rep(1, i), rep(0, n - i))
+    pregunta <- sample(apuesta, n, replace = TRUE)
+  
+    # Generar la respuesta según la lógica dada
+    respuesta <- ifelse(pregunta == 0, ifelse(muestra_base_pi == 1, 0, 1), muestra_base_pi)
+  
+    # Crear el tibble para este p
+    df <- tibble(
+    muestra_base = muestra_base_pi,
+    pregunta = pregunta,
+    respuesta = respuesta,
+    p_valor = i
+    )
+  
+    # Agregarlo a la lista
+    resultados[[length(resultados) + 1]] <- df
+  }
+
+  # Unir todos los data frames
+  tabla_final <- bind_rows(resultados)
+
+  # Ver resultado
+  #print(tabla_final)
+
+  # Ver las respuestas para diferente posiciones
+  y_p <- tabla_final %>% 
+    group_by(p_valor) %>% 
+   summarise(sum(respuesta))
+
+  # Cambia el tipo de variable de las respuestas para que tome las pbeta y beta
+  y <- c(as.numeric(y_p[1,2]),
+        as.numeric(y_p[2,2]),
+        as.numeric(y_p[3,2]),
+        as.numeric(y_p[4,2]))
+
+  # Lista para el posterior
+  post_7 <- list()
+  post_n7 <- c("p = 0.3", "p = 0.45", "p = 0.6", "p = 0.8")
+
+  # Hacer el posterior a partir de la muestra
+  for (i in 1:4) {
+    # paso 4: establecemos un numerador donde lambda toma valores para p y posibles val de pi
+    num_6 <- (lambda(p[i],pi_grid)^y[i])*((1-lambda(p[i],pi_grid))^(n-y[i]))* (1-2*p[i])
+  
+    # paso 5: denominador que salio de consulta
+    denom_6 <- (pbeta(1 - p[i],y[i]+1,n-y[i]+1)*beta(y[i]+1,n-y[i]+1)) - (pbeta(p[i],y[i]+1,n-y[i]+1)*beta(y[i]+1,n-y[i]+1))
+  
+    # paso 6: posterior
+    posterior_6 <- num_6 / denom_6
+  
+    post_7[[post_n7[i]]] <- posterior_6
+  }
+
+  # Crear un data.frame
+  datos <- data.frame(
+    p = rep(pi_grid, times = 4),
+    posterior = c(post_7[[1]], post_7[[2]], post_7[[3]], post_7[[4]]),
+    alumno = rep(c("p = 0.3","p = 0.45", "p = 0.6", "p = 0.8"), each = 200))
+
+  # Crear el gráfico con ggplot2 con los siguientes mapeos
+  titulo_grafico <- bquote(pi ~ "real = " ~ .(pi_line[line]))
+  
+  graficos_post[[line]] <- ggplot(datos, aes(x = p, y = posterior, color = alumno)) +
+    geom_line() +
+    geom_area(aes(fill = alumno), alpha = 0.4, position = "identity") +
+    scale_color_manual(values = colores) +
+    scale_fill_manual(values = colores) +
+    labs(
+      x = expression(pi),
+      y = expression(paste("p(", pi, " | y)")),
+      title = titulo_grafico
+    ) +
+    theme_bw() +
+    theme(panel.grid = element_blank()) +
+    geom_vline(xintercept = pi_line[line], linetype = "dashed", color = "red", size = 0.5) +
+    theme(plot.title = element_text(hjust = 0.5, size = 12, face = "bold"))
+
+
+
+}
+```
+
+```{r,echo=FALSE, warning=FALSE, message=FALSE, fig.align = "center", fig.width = 6, fig.height = 3.8}
+
+# Concatenar graficos
+# Cargar si no lo hiciste
+library(gridExtra)
+
+# Primer par
+grid.arrange(graficos_post[[1]], graficos_post[[2]], nrow = 2)
+
+# Segundo par
+grid.arrange(graficos_post[[3]], graficos_post[[4]], nrow = 2)
+
+```
+
+A pesar de que las poblaciones son distintas, se puede ver como para la
+mayoria de graficos en general el comportamiento más variable es el de
+cuando $p = 0.45$ lo cual nos ayuda a entender que si el $p$ es cercano
+a 0.5 menos información de la realidad nos puede aportar cada muestra
+aumentando la variabilidad de la incertidumbre para el parámetro de
+interés $\pi$
+
+A medida que aumenta la cantidad de apostadores en la poblacion se
+observa que para los diferentes $p$ la variabilidad gira en torno al
+verdadero valor de $\pi$ para los casos más extremos de $p$ (0.3 y 0.8),
+mientras que para los caso de $p$ cercanos a 0.5 (0.45 y 0.6) como son
+muy variables no podemos obtener una buena precisión al verdadero valor.
+
+El método de Warner es más consistente cuando el valor de $p$ se aleja
+de 0.5. Esto significa que, para mecanismos aleatorizados en los que se
+obtiene una de las preguntas con probabilidad $p$, el método de Warner
+ofrece mejores resultados en comparación con aquellos mecanismos cuando
+$p$ está cerca de 0.5.
+
+### Recursos para proximos análisis
+
+Desde el principio se estableció un $Prior$ con distribución Beta con
+comportamiento de una Uniforme, una buena practica seria hacer una
+función de manera que se le puedan establecer unos parametros y esta
+devuelva las inferencias al menos de manera aproximada y para
+simplificar un poco los parametros de esta, usando la grilla de $\pi_a$
+
+```{r , fig.align = "center", fig.width = 5, fig.height = 4, warning=FALSE}
+#función del posterior para un prior no necesariamente uniforme
+
+posterior_war <- function(pi, p, a, b){
+  # Establecemos la función lambda del método warner
+  lambda_W <- function(p, pi_a){return(pi_a*p + (1-p)*(1-pi_a))}
+  # Simulamos una muestra de respuestas afirmativas con el parametro lambda_w
+  y <- rbinom(1,100,lambda(p, pi))
+  # Construimos el numerador del posterior aproximado
+  num <- dbeta(pi_grid, a, b) * dbinom(y, 100, lambda(p, pi_grid))
+  # Construimos el denominador del posterior aproximado
+  delta <- diff(pi_grid)[1] 
+  denom <- sum(num) * delta
+  # Obtenemos el Posterior exacto
+  posterior <- num / denom
+  return(posterior)
+}
+
+```
+
+\newpage
+
+## Método Greenberg {#Objetivo-3}
+
+### Probabilidad de respuesta afirmativa segun el método Greenberg
+
+Esta técnica de respuesta aleatoria consiste en presentar una de dos
+posibles preguntas al alumno encuestado, con probabilidad $p$, se le
+pregunta sobre el tema de interés (¿Realiza apuestas deportivas en
+linea?), y con probabilidad $1-p$, se le pregunta sobre un tema no
+relacionado del cual se conoce la probabilidad a priori (¿Naciste en un
+mes con 31 días?)
+
+Esta estrategia permite preservar la privacidad del encuentado y obtener
+una estimación de $\pi_a$. Se asume que se conoce de antemano la
+proporción de personas que pertenecen al tema no relacionado
+($\pi_B = \dfrac{7}{12}$)
+
+En el marco del método propuesto por Greenberg, es de interés conocer la
+probabilidad de que un individuo responda afirmativamente o
+negativamente a la pregunta que se le presenta. Dado que la técnica
+implica un mecanismo aleatorio donde las personas pueden ser consultadas
+sobre una categoría sensible o una no sensible con determinadas
+probabilidades, la respuesta observada no refleja directamente la
+verdadera pertenencia del individuo a una categoría, sino una
+combinación probabilística de ambas posibilidades.
+
+-   $y \text{ = } \text{El estudiante responde afirmativamente } P(y) = \lambda_G$
+
+-   $\lambda_G$ = Probabilidad de que un estudiante responda
+    afirmativamente
+
+-   $1 - \lambda_G$ = Probabilidad de que un estudiante no responda
+    afirmativamente
+
+-   $\pi_a$ = Probabilidad de que un estudiante realice apuestas online
+
+-   $\pi_B \text{ = } \text{Probabilidad de que un estudiante pertenezca a la categoria B. } P(\pi_b) = \dfrac{7}{12}$
+
+-   $Q_1 \text{ = } \text{Pregunta 1 (¿Participas en apuestas en linea?). } P(Q)=p \ conocido$
+
+-   $Q_2 \text{ = } \text{Pregunta 2 (¿Es cierto que naciste en un mes con 31 dias?). } P(Q_2)=(1-p) \ conocido$
+
+Para la probabilidad de que un estudiante responda afirmativamente,
+tomamos el método de probabilidad total
+
+$$ \lambda_G = P(y) = P(y,Q_1) + P(y,Q_2)$$
+$$\\ = P(\text{y} \mid Q_1) \cdot P(Q_1) + P(\text{y} \mid Q_2) \cdot P(Q_2) $$
+$$\\= \pi_a \cdot p + \pi_B \cdot (1 - p)$$
+$$\\= \pi_a \cdot p + \dfrac{7}{12} \cdot (1 - p)$$
+
+Para la probabilidad de que un estudiante responda de forma negativa
+
+$$ P(y^c) = P(y^c,Q_1) + P(y^c,Q_2)$$
+$$\\= P(y^c \mid Q_1) \cdot P(Q_1) + P(y^c \mid Q_2) \cdot P(Q_2)$$
+$$\\= (1 - \pi_a) \cdot p + (1 - \pi_B) \cdot (1 - p)$$
+$$\\= (1 - \pi_a) \cdot p + \dfrac{5}{12} \cdot (1 - p)$$
+
+Estos valores permiten establecer el vínculo entre las respuestas
+observadas y la proporción real de interés en la población.
+
+$$\text{Distribución del Prior}$$ $$ \pi_a \sim Beta(a = 1, b = 1) \\$$
+$$\text{Distribución del Likelihood}$$
+$$\text{y| }\pi\_a \sim \text{Binomial}(n, \lambda_G), \text{ con } \lambda_G \text{ función de } \pi_a \\$$
+
+### Crear una función para el método Greenberg
+
+Una vez conocida la probabilidad de respuesta afirmativa en el marco del
+método de Greenberg, es posible avanzar en la construcción de un modelo
+bayesiano que permita inferir la proporción real de la población que
+pertenece a la categoría sensible. Para ello, se propone utilizar una
+distribución Beta como distribución a priori, la cual ofrece
+flexibilidad al modelar distintos niveles de conocimiento o supuestos
+previos sobre la proporción de interés.
+
+A continuación, se implementa una función en R que permite realizar esta
+inferencia de manera aproximada, utilizando simulación. La función
+contempla la posibilidad de incorporar distintos parámetros para la
+distribución beta previa, lo que permite ajustar el modelo a diferentes
+contextos o creencias previas del analista.
+
+```{r , message=FALSE, warning=FALSE, paged.print=FALSE}
+# función del posterior para un prior no necesariamente uniforme con el método Greenberg
+
+posterior_green <- function(pi, p, a, b, pi_b = 7/12){
+  # Establecemos la función lambda con la probabilidad conocida pi_b = 7/12
+  lambda_g <- function(p, pi_a){return(pi_a*p + pi_b*(1-p))}
+  # Simulamos una muestra de respuestas afirmativas con el parametro lambda_g
+  y <- rbinom(1,100,lambda_g(p, pi))
+  # Construimos el numerador del posterior aproximado
+  num <- dbeta(pi_grid, a, b) * dbinom(y, 100, lambda(p, pi_grid))
+  # Construimos el denominador del posterior aproximado
+  delta <- diff(pi_grid)[1] 
+  denom <- sum(num) * delta
+  # Obtenemos el Posterior exacto
+  posterior <- num / denom
+  return(posterior)
+}
+
+```
+
+```{=latex}
+\clearpage
+```
+## Conclusiones finales de todos los métodos {#Objetivo-4}
+
+Finalizando todos los análisis planteados anteriormente se haran
+comparaciones para 3 niveles de mentira de los estudiantes y cada método
+de aleatorización Warner y Greenberg, donde estos métodos de respuesta
+aleatoria tienen una probabilidad de pregunta de $p = 0.3$
+
+```{r,echo=FALSE, fig.align = "center", warning=FALSE, fig.width = 7, fig.height = 3.2}
+set.seed(1998)
+
+#Muestra base para los 6 procedimientos
+apuesta_b <- sample(poblacion$apuesta, n, replace = T)
+
+#Procedimiento sin mentira, con mentira de nivel mu (bajo, medio ,alto)
+#Guardo la lista que devuelve la función para poder graficar
+post_mu <- muestra_mu(c(0, 0.3, 0.45, 0.8), 1, 1, apuesta_b)
+
+  # Crear un data.frame
+  datos <- data.frame(
+    p = rep(pi_grid, times = 4),
+    posterior = c(post_mu[[1]], post_mu[[2]], post_mu[[3]], post_mu[[4]]),
+    Mentira = rep(c("Miente μ = 0","Miente μ = 0.3", "Miente μ = 0.45", "Miente μ = 0.8"), each = 200))
+  
+  # Crear el grafico con ggplot2 con los siguientes mapeos
+  ggplot(datos, aes(x = p, y = posterior, color = Mentira)) +
+    geom_line() +
+    geom_area(aes(fill = Mentira), alpha = 0.4, position = "identity") +
+    ggtitle("Posterior para los niveles de μ") +
+    scale_color_manual(values = colores) +
+    scale_fill_manual(values = colores) +
+    labs(x = expression(pi), y = expression("p(" ~ pi ~ "| y)")) +
+    theme_bw() +
+    theme(
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+    )
+
+```
+
+```{r,echo=FALSE, fig.align = "center", fig.width = 9, fig.height = 3.5, warning=FALSE}
+set.seed(2198)
+#método warner
+#Guardo la lista que devuelve la función para poder graficar
+posterior_w <- muestra_war(0.3, apuesta_b)
+
+  datos_warner <- data.frame(
+    p = rep(pi_grid, times = length(posterior_w)),
+    posterior = c(posterior_w[[1]]),
+    Mentira = rep(c("p=0.3"), each = 200))
+  
+  # Crear el grafico con ggplot2 con los siguientes mapeos
+  post_w <- ggplot(datos_warner, aes(x = p, y = posterior, color = Mentira)) +
+    geom_line() +
+    geom_area(aes(fill = Mentira), alpha = 0.4, position = "identity") +
+    ggtitle("Posterior Warner") +
+    scale_color_manual(values = "#E76F51") +
+    scale_fill_manual(values = "#E76F51") +
+    labs(x = expression(pi), y = expression("p(" ~ pi ~ "| y)")) +
+    theme_bw() +
+    theme(
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+    )
+
+#método Greenberg
+#Definimos una función para evaluar distintos caso de p con un prior uniforme
+muestra_green <- function(p, apuesta_b){
+  # Hacemos función para lambda_w
+  lambda_g <- function(p, pi_a = 0.4){return(pi_a*p + (7/12)*(1-p))}
+  
+  # Lista para guardar los resultados
+  resultados_g <- list()
+  
+  #lista para guardar posterior warner
+  posterior_g <- list()
+  
+  y <- numeric(4)
+  for (i in 1:length(p)) {
+    # Generar la pregunta con p unos y el resto ceros
+    pregunta <- sample(c(rep(1, (p[i]*100)), rep(0, n - (p[i]*100))), n, replace = TRUE)
+    
+    # Generar la respuesta según la lógica dada
+    respuesta <- ifelse(pregunta == 0, ifelse(apuesta_b == 1, 0, 1), apuesta_b)
+    
+    # Crear el tibble para este p y agregarlo a la lista
+    resultados_g[[length(resultados_g) + 1]] <- tibble(muestra_base = apuesta_b,
+                                                       pregunta = pregunta,
+                                                       respuesta = respuesta,
+                                                       p_valor = p[i])
+    
+    #convierto a data frame
+    datos_g <- as.data.frame(resultados_g[[i]])
+    
+    # Hacer el posterior exacto a partir de la muestra
+    y[i] <- sum(datos_g$respuesta)
+    # Establecemos el numerador donde lambda toma valores para p y posibles val de pi
+    num_g <- (lambda_g(p[i], pi_grid) ^ y[i])*((1-lambda_g(p[i], pi_grid)) ^ (n - y[i]))* (1 - 2 * p[i])
+    
+    # paso 5: denominador que salio de consulta
+    denom_g <- (pbeta(1 - p[i], y[i] + 1, n - y[i] + 1) * beta(y[i] + 1, n - y[i] + 1)) - (pbeta(p[i] ,y[i] +1,n-y[i] +1)*beta(y[i] +1, n-y[i] +1))
+    
+    # paso 6: posterior
+    posterior_g[[length(posterior_g) + 1]] <- num_g / denom_g
+    
+  }
+  return(posterior_g)
+}
+#Guardo la lista que devuelve la función para poder graficar
+posterior_g <- muestra_green(0.3, apuesta_b)
+
+  datos_green <- data.frame(
+    p = rep(pi_grid, times = length(posterior_g)),
+    posterior = c(posterior_g[[1]]),
+    Mentira = rep(c("p=0.3"), each = 200))
+  
+  # Crear el grafico con ggplot2 con los siguientes mapeos
+  post_g <-ggplot(datos_green, aes(x = p, y = posterior, color = Mentira)) +
+    geom_line() +
+    geom_area(aes(fill = Mentira), alpha = 0.4, position = "identity") +
+    ggtitle("Posterior Greenberg") +
+    scale_color_manual(values = "#287271") +
+    scale_fill_manual(values = "#287271") +
+    labs(x = expression(pi), y = expression("p(" ~ pi ~ "| y)")) +
+    theme_bw() +
+    theme(
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+    )
+  
+# Concatenar graficos
+post_w | post_g
+```
+
+Para una única muestra proveniente de una población con $\pi = 0.4$, se
+evaluaron tres escenarios diferentes sobre la misma base muestral: en
+primer lugar, se incorporaron distintos niveles de mentira $\mu$ que
+afectan directamente las respuestas sobre la variable de interés, y en
+segundo lugar, se aplicaron los métodos de respuesta aleatorizada de
+Warner y Greenberg sobre la misma muestra. A partir del análisis, se
+observa que al aumentar los niveles de mentira, la variabilidad de las
+distribuciones a posteriori disminuye. Sin embargo, dichas
+distribuciones se encuentran sesgadas respecto al valor verdadero de
+$\pi$. En contraste, las distribuciones generadas bajo los métodos de
+Warner y Greenberg tienden a centrarse en el valor verdadero de $\pi$,
+lo que indicaría una estimación más precisa.
+
+Cabe destacar que, aunque ambos métodos muestran resultados
+consistentes, el método de Greenberg presenta una variabilidad
+ligeramente mayor en comparación con el de Warner. Esta diferencia
+podría atribuirse a la formulación del mecanismo de respuesta: en el
+método de Greenberg se utiliza una pregunta no relacionada con la
+variable de interés, mientras que en el método de Warner se formula una
+negación de la pregunta original, lo cual podría reducir la dispersión
+en las respuestas.
+
+### Aumentando la cantidad de simulaciones
+
+Dado que el análisis se basa en una única simulación, no es posible
+obtener conclusiones precisas respecto al comportamiento de la variable
+en estudio. Por ello, resulta necesario aumentar la cantidad de
+simulaciones con el fin de evaluar mejor cómo la variabilidad influye
+sobre las estimaciones del parámetro de interés.
+
+```{r,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 4, warning=FALSE}
+set.seed(1998)
+
+#Muestra base para los 6 procedimientos con mil simulaciones
+
+int_m_0 <- matrix(NA, nrow = 1000, ncol = 2)
+int_m_1 <- matrix(NA, nrow = 1000, ncol = 2)
+int_m_2 <- matrix(NA, nrow = 1000, ncol = 2)
+int_m_3 <- matrix(NA, nrow = 1000, ncol = 2)
+int_w <- matrix(NA, nrow = 1000, ncol = 2)
+int_g <- matrix(NA, nrow = 1000, ncol = 2)
+
+
+for (i in 1:1000) {
+  apuesta_b <- sample(poblacion$apuesta, n, replace = T)
+  
+  #Procedimiento sin mentira, con mentira de nivel mu (bajo, medio ,alto)
+  post_m <- muestra_mu(c(0, 0.3, 0.45, 0.8), 1, 1, apuesta_b) #devuelve una lista con cada posterior segun mu
+  
+  #Procedimiento del método Warner con p = 0.3
+  posterior_w <- muestra_war(0.3, apuesta_b) #devuelve una lista con el posterior warner
+  
+  #método Greenberg
+  posterior_g <- muestra_green(0.3, apuesta_b) #devuelve una lista con el posterior Greenberg
+  
+  # 1. Normalizamos:
+  dens_m_0 <- post_m[[1]] / sum(post_m[[1]])
+  dens_m_1 <- post_m[[2]] / sum(post_m[[2]])
+  dens_m_2 <- post_m[[3]] / sum(post_m[[3]])
+  dens_m_3 <- post_m[[4]] / sum(post_m[[4]])
+  dens_w <- posterior_w[[1]] / sum(posterior_w[[1]])
+  dens_g <- posterior_g[[1]] / sum(posterior_g[[1]])
+  
+  # 2. Calcula la función de distribución acumulada (CDF):
+  cdf_m_0 <- cumsum(dens_m_0)
+  cdf_m_1 <- cumsum(dens_m_1)
+  cdf_m_2 <- cumsum(dens_m_2)
+  cdf_m_3 <- cumsum(dens_m_3)
+  cdf_w <- cumsum(dens_w)
+  cdf_g <- cumsum(dens_g)
+  
+
+  # 3. intervalos del 90%
+  int_m_0[i, ] <- c(pi_grid[which.min(abs(cdf_m_0 - 0.05))], pi_grid[which.min(abs(cdf_m_0 - 0.95))])
+  int_m_1[i, ] <- c(pi_grid[which.min(abs(cdf_m_1 - 0.05))], pi_grid[which.min(abs(cdf_m_1 - 0.95))])
+  int_m_2[i, ] <- c(pi_grid[which.min(abs(cdf_m_2 - 0.05))], pi_grid[which.min(abs(cdf_m_2 - 0.95))])
+  int_m_3[i, ] <- c(pi_grid[which.min(abs(cdf_m_3 - 0.05))], pi_grid[which.min(abs(cdf_m_3 - 0.95))])
+  
+  int_w[i, ] <- c(pi_grid[which.min(abs(cdf_w - 0.05))], pi_grid[which.min(abs(cdf_w - 0.95))])
+  int_g[i, ] <- c(pi_grid[which.min(abs(cdf_g - 0.05))], pi_grid[which.min(abs(cdf_g - 0.95))])
+  
+}
+
+# Ver cuántos intervalos cubren el valor 0.4
+cubre_0 <- (int_m_0[,1] <= 0.4) & (int_m_0[,2] >= 0.4)
+cubre_1 <- (int_m_1[,1] <= 0.4) & (int_m_1[,2] >= 0.4)
+cubre_2 <- (int_m_2[,1] <= 0.4) & (int_m_2[,2] >= 0.4)
+cubre_3 <- (int_m_3[,1] <= 0.4) & (int_m_3[,2] >= 0.4)
+cubre_w <- (int_w[,1] <= 0.4) & (int_w[,2] >= 0.4)
+cubre_g <- (int_g[,1] <= 0.4) & (int_g[,2] >= 0.4)
+
+# Proporción de intervalos que lo cubren
+resultados <- tibble(
+  Método = factor(
+    c("μ = 0", "μ = 0.3", "μ = 0.45", "μ = 0.8", "Warner", "Greenberg"),
+    levels = c("μ = 0", "μ = 0.3", "μ = 0.45", "μ = 0.8", "Warner", "Greenberg")
+  ),
+  Cobertura = c(mean(cubre_0), mean(cubre_1), mean(cubre_2), mean(cubre_3), 
+                mean(cubre_w), mean(cubre_g))
+)
+
+
+ggplot(resultados, aes(x = Método, y = Cobertura)) +
+  geom_col(fill = c("#f08533", "#3b78b0", "#d1352c" , "#44A699","#E76F51", "#287271"), alpha = 0.65) +
+  geom_text(aes(label = round(Cobertura, 3)), vjust = -0.5, size = 4) +
+  labs(
+    title = expression("Comparación entre los distintos métodos "),
+    subtitle = "Cobertura de intervalos del 90%",
+    x = "Método",
+    y = "Cobertura"
+  ) +
+  ylim(0, 1) +
+  theme_minimal(base_size = 13)+
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+```
+
+Como se observa en el gráfico, a medida que el nivel de mentira aumenta,
+la proporción de intervalos de credibilidad del 90% que incluyen al
+verdadero valor de $\pi$ disminuye de manera considerable. Este fenómeno
+se evidencia con claridad al comparar el escenario sin mentira, donde la
+cobertura alcanza aproximadamente un 88.8%, con el caso en que el nivel
+de mentira es $\mu = 0.3$, en el cual la cobertura desciende a 17.4%.
+Estos resultados permiten concluir, de manera empírica, que considerar
+el nivel de mentira como parte del modelo resulta fundamental para
+lograr estimaciones más precisas del valor verdadero de $\pi$.
+
+Por otro lado, se destaca que los métodos de Warner y Greenberg
+presentan proporciónes de cobertura similares, e incluso superiores, a
+las observadas en la población donde no se miente. Este comportamiento
+podría atribuirse al supuesto fuerte adoptado en el análisis, según el
+cual los estudiantes no mienten cuando responden bajo estos métodos.
+
+En resumen, no se evidencian diferencias significativas entre los
+métodos considerados, pero sí se observan variaciones importantes en la
+cobertura según los distintos valores asumidos para el nivel de mentira
+$\mu$.
