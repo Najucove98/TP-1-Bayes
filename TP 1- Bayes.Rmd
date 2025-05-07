@@ -181,7 +181,7 @@ plt_likelihood <- data.frame(x = pi_grid, y = likelihood) |>
 La distribución a posteriori representa una combinación convexa entre la verosimilitud de los datos ($Likelihood$) y la credibilidad a $priori$. 
 $$ p(\pi_a/y) \propto p(y/\pi_a).p(\pi_a) $$
 
-```{r fig1, echo = FALSE, fig.width=10, fig.height=3, fig.cap="Distribucion del modelo bayesiano"}
+```{r, echo=FALSE}
 # Obtener posterior
 posterior <- dbeta(pi_grid, 1 + apuestan, 1 + n - apuestan)
 
@@ -197,10 +197,19 @@ plt_posterior <- data.frame(x = pi_grid, y = posterior) |>
   theme_bw() +
   theme(panel.grid.minor = element_blank())
 
-# Concatenar graficos
-plt_prior | plt_likelihood | plt_posterior
 
 ```
+
+```{r fig1, echo = FALSE, fig.width=10, fig.height=3, fig.cap="Distribucion del modelo bayesiano"}
+
+# Concatenar graficos
+combinado <- (plt_prior | plt_likelihood | plt_posterior)
+
+combinado
+
+```
+
+
 @ref(fig:fig1) esto es para llamar a la imagen del grafico
 
 Partiendo del gráfico @ref(fig:fig1) se puede ver como el $Likelihood$ influye
