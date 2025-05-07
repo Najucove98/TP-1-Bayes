@@ -51,55 +51,37 @@ editor_options:
 
 ## Introducción
 
-Las apuestas en línea han ganado una creciente popularidad entre los
-adolescentes, impulsadas por la accesibilidad de plataformás digitales y
-la constante exposición a la publicidad en redes sociales y eventos
-deportivos. Donde en un principio se plantean que tienen el "control"
-cuando la realidad termina siendo mucho más complejas, cuando se quedan
-enredados en una nube de rachas ganadoras y cuando empiezan a perder
-dinero siguen en el juego con la esperanza de recuperar.
+Las apuestas en línea han ganado una creciente popularidad entre los adolescentes, impulsadas por la accesibilidad de plataformas digitales y la constante exposición a la publicidad en redes sociales y eventos deportivos. En principio, creen tener el "control", pero la realidad resulta ser mucho más compleja: quedan atrapados en una nube de rachas ganadoras y, cuando comienzan a perder dinero, continúan apostando con la esperanza de recuperarlo.
 
-Además de esto el poder realizar estudios sobre el tema es complejo,
-porque a muchos adolescentes les causa verguenza el admitir que
-practican dichos juegos; por lo tanto se crearon diversos métodos de
-encuesta para reducir los sesgos por la mentira que pueden proporciónar
-los usuarios o por el simple hecho de no querer responder, en este
-trabajo se podran ver reflejados dos de estos métodos, como funciónan y
-el análisis correspondiente con cada uno de los métodos.
+Además de esto el poder realizar estudios sobre el tema es complejo, a muchos adolescentes les causa vergüenza el admitir que practican dichas apuestas, por lo que optan por no responder con sinceridad a ciertas preguntas, por ejemplo en el marco de una encuesta. Este fenómeno, conocido como sesgo de respuesta, representa un desafío para quienes buscan obtener datos fiables en encuestas y estudios sobre este tema.
+
+Partiendo de la premisa de que una forma de incrementar la cooperación de los encuestados es garantizar la protección de información sensible, una posible forma de mitigar este sesgo es la técnica de respuesta aleatorizada, que permite que los encuestados respondan de manera más sincera sin temor a ser identificados. En la técnica de respuesta aleatorizada, se introduce una cuota de azar con el objetivo de preservar la privacidad de la persona que responde.
+
+Estudiaremos dos técnicas de respuesta aleatorizada y nos centraremos en el problema de querer realizar inferencias sobre $\pi_A$, la proporción de estudiantes de una escuela que participan de apuestas deportivas en línea.
 
 \newpage
 
-## Indice
+## Índice
 
-1.[**Análisis de estudio considerando la mentira al responder las
-preguntas**](#Objetivo-1)
+1.[**El efecto de la mentira en las estimaciones**](#Objetivo-1)
 
-2.[**Análisis de los apostadores utilizando el método de
-Warner**](#Objetivo-2)
+2.[**Método de Warner**](#Objetivo-2)
 
-3.[**Análisis de los apostadores utilizando el método de
-Greenberg**](#Objetivo-3)
+3.[**Método de Greenberg**](#Objetivo-3)
 
-4.[**Conclusiones finales sobre los métodos de respuesta
-aleatorizada**](#Objetivo-4)
+4.[**Conclusiones finales sobre los métodos de respuesta aleatorizada**](#Objetivo-4)
 
 \newpage
 
-### Análisis de estudio considerando la mentira al responder las preguntas {#Objetivo-1}
+### El efecto de la mentira en las estimaciones {#Objetivo-1}
 
-Se sabe que este es un tema que en muchos alumnos puede llegar a ser un
-tema de verguenza porque algunos han llegado a perder mucho dinero, por
-lo que muy posiblemente al hacerles la pregunta "¿Haz apostado en algun
-momento?" posiblemente no sean honestos al responder.
+Dado que el tema de las apuestas en línea puede resultar delicado para muchos estudiantes, se considera que varios de ellos podrían optar por no responder con total sinceridad a la encuesta realizada. Esta posible falta de veracidad introduce un sesgo en los datos recolectados, lo que justifica la necesidad de un enfoque estadístico que permita incorporar dicha incertidumbre en el análisis.
 
-Entonces entrando en materia del estudio se propone un modelo bayesiano,
-ya que se busca saber si el alumno miente en la pregunta dado que ya se
-sabe la respuesta y la probabilidad(p) con la que le toque la pregunta,
-para esto se toma la información obtenida $(Prior)$ y la que se piensa
-que puede ser para llegar a una conclusion $(Likelihood)$ que hace
-combinar la información obtenida junto con la supuesta $(Posterior)$.
+Con este objetivo, se propone un modelo bayesiano centrado en el parámetro de interés, denotado como $\pi_A$, que representa la proporción real de estudiantes que apuestan en línea. Este enfoque considera diferentes grados de falta de sinceridad en las respuestas, introduciendo un nuevo parámetro (conocido), $\mu$, que corresponde a la probabilidad de que un estudiante que apuesta mienta al responder.
 
-```{r echo=FALSE, fig.height=300, fig.width=400, message=FALSE, warning=FALSE, paged.print=FALSE}
+Con el fin de realizar estudios comparativos, se asumirá que en la población el porcentaje de estudiantes que han participado en apuestas en línea es del 40%. A partir de esta suposición, se simularán muestras de tamaño n = 100, considerando que los estudiantes que efectivamente han apostado alguna vez pueden mentir al responder, con una probabilidad denotada por $\mu$.
+
+```{r ,echo=FALSE, fig.height=300, fig.width=400, message=FALSE, warning=FALSE, paged.print=FALSE}
 library(sampling)
 library(tidyverse)
 library(patchwork)
@@ -124,7 +106,7 @@ poblacion <- data.frame(estudiante = seq(1:N), apuesta = sample(apuesta) )
 -   $\pi_a$: Proporción de estudiantes de una escuela que participan de
     apuestas deportivas en línea.
 
--   $n$: Cantidad de estudiantes en la muestra.
+-   $n$: Cantidad de estudiantes encuestados.
 
 -   $y$: Número de estudiantes que apuestan.
 
