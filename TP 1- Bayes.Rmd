@@ -200,6 +200,7 @@ plt_posterior <- data.frame(x = pi_grid, y = posterior) |>
 
 ```
 
+
 ```{r fig1, echo = FALSE, fig.width=10, fig.height=3, fig.cap="Distribucion del modelo bayesiano"}
 
 # Concatenar graficos
@@ -209,16 +210,7 @@ combinado
 
 ```
 
-
-@ref(fig:fig1) esto es para llamar a la imagen del grafico
-
-Partiendo del gráfico @ref(fig:fig1) se puede ver como el $Likelihood$ influye
-mucho en la respuesta final, ya que la creencia inicial era la
-incertidumbre total (cualquier valor tiene una misma probabilidad) que
-en este caso de estudio seria que la probabilidad de la proporción de
-estudiantes que apuestan en la escuela es la misma para cualquier valor
-de la proporción, es decir, la probabilidad de que la proporción de
-estudiantes que apueste sea del 50% es la misma a la del 1%.
+Partiendo de una creencia inicial en la que todos los valores posibles de $\pi_a$ son igualmente probables, se observa en el gráfico @ref(fig:fig1) que la verosimilitud ($likelihood$) y la distribución $posterior$ son similares. Esto se debe a que la elección del $prior$ no afecta directamente al $posterior$, lo que genera que tenga una forma distribucional similar a la de la verosimilitud de los datos.
 
 ### Niveles de mentira de los estudiantes
 
