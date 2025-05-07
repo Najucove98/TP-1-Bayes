@@ -57,7 +57,7 @@ Además de esto el poder realizar estudios sobre el tema es complejo, a muchos a
 
 Partiendo de la premisa de que una forma de incrementar la cooperación de los encuestados es garantizar la protección de información sensible, una posible forma de mitigar este sesgo es la técnica de respuesta aleatorizada, que permite que los encuestados respondan de manera más sincera sin temor a ser identificados. En la técnica de respuesta aleatorizada, se introduce una cuota de azar con el objetivo de preservar la privacidad de la persona que responde.
 
-Estudiaremos dos técnicas de respuesta aleatorizada y nos centraremos en el problema de querer realizar inferencias sobre $\pi_A$, la proporción de estudiantes de una escuela que participan de apuestas deportivas en línea.
+Estudiaremos dos técnicas de respuesta aleatorizada y nos centraremos en el problema de querer realizar inferencias sobre $\pi_a$, la proporción de estudiantes de una escuela que participan de apuestas deportivas en línea.
 
 \newpage
 
@@ -77,7 +77,7 @@ Estudiaremos dos técnicas de respuesta aleatorizada y nos centraremos en el pro
 
 Dado que el tema de las apuestas en línea puede resultar delicado para muchos estudiantes, se considera que varios de ellos podrían optar por no responder con total sinceridad a la encuesta realizada. Esta posible falta de veracidad introduce un sesgo en los datos recolectados, lo que justifica la necesidad de un enfoque estadístico que permita incorporar dicha incertidumbre en el análisis.
 
-Con este objetivo, se propone un modelo bayesiano centrado en el parámetro de interés, denotado como $\pi_A$, que representa la proporción real de estudiantes que apuestan en línea. Este enfoque considera diferentes grados de falta de sinceridad en las respuestas, introduciendo un nuevo parámetro (conocido), $\mu$, que corresponde a la probabilidad de que un estudiante que apuesta mienta al responder.
+Con este objetivo, se propone un modelo bayesiano centrado en el parámetro de interés, denotado como $\pi_a$, que representa la proporción real de estudiantes que apuestan en línea. Este enfoque considera diferentes grados de falta de sinceridad en las respuestas, introduciendo un nuevo parámetro (conocido), $\mu$, que corresponde a la probabilidad de que un estudiante que apuesta mienta al responder.
 
 Con el fin de realizar estudios comparativos, se asumirá que en la población el porcentaje de estudiantes que han participado en apuestas en línea es del 40%. A partir de esta suposición, se simularán muestras de tamaño n = 100, considerando que los estudiantes que efectivamente han apostado alguna vez pueden mentir al responder, con una probabilidad denotada por $\mu$.
 
@@ -103,8 +103,7 @@ poblacion <- data.frame(estudiante = seq(1:N), apuesta = sample(apuesta) )
 
 ### Modelo bayesiano Beta-Binomial
 
--   $\pi_a$: Proporción de estudiantes de una escuela que participan de
-    apuestas deportivas en línea.
+-   $\pi_a$: Proporción de estudiantes de una escuela que participan de apuestas deportivas en línea.
 
 -   $n$: Cantidad de estudiantes encuestados.
 
@@ -112,7 +111,7 @@ poblacion <- data.frame(estudiante = seq(1:N), apuesta = sample(apuesta) )
 
 #### Prior:
 
-Considerando la naturaleza del parámetro, se busca asignar una credibilidad a priori a los posibles valores de $\pi_A$. Esta credibilidad puede modelarse mediante una distribución beta, con el objetivo de reflejar que todos los valores entre 0 y 1 son igualmente probables. En particular, se utilizo una distribución uniforme, es decir, una distribución beta con parámetros a = 1 y b = 1.
+Considerando la naturaleza del parámetro, se busca asignar una credibilidad a priori a los posibles valores de $\pi_a$. Esta credibilidad puede modelarse mediante una distribución beta, con el objetivo de reflejar que todos los valores entre 0 y 1 son igualmente probables. En particular, se utilizo una distribución uniforme, es decir, una distribución beta con parámetros a = 1 y b = 1.
 $$ \pi_a \sim Beta(a = 1, b = 1) $$
 
 ```{=latex}
@@ -142,9 +141,8 @@ plt_prior <- data.frame(x = pi_grid, y = prior) |>
 ```
 
 #### Likelihood(función de verosimilitud):
-
-El likelihood es una función de cuan probable es un valor especifico de la variable $Y_i$ en donde se piensa que la proporción de estudiantes que apuestan
-es del 40% $$ Y_i/\pi_a \sim Bi(n , \pi_a) $$
+El $likelihood$ es una función que mide cuán probable es observar los datos $y_i$ dado un valor especifico del parámetro $\pi_a$, es decir, evalúa la probabilidad de los datos en función del parámetro.
+$$ y \mid \pi_a \sim Bi(n , \pi_a) $$
 
 ```{=latex}
 \FloatBarrier
@@ -177,8 +175,7 @@ plt_likelihood <- data.frame(x = pi_grid, y = likelihood) |>
 ```
 
 #### Posterior:
-
-La distribución a posteriori representa una combinación convexa entre la verosimilitud de los datos ($Likelihood$) y la credibilidad a $priori$. 
+La distribución a $posteriori$ representa nuestro conocimiento actualizado sobre un parámetro después de haber observado los datos. Se obtiene como el producto entre el $prior$ (lo que se creía antes) y el $likelihood$ (la verosimilitud de los datos).
 $$ p(\pi_a/y) \propto p(y/\pi_a).p(\pi_a) $$
 
 ```{r, echo=FALSE}
@@ -196,13 +193,9 @@ plt_posterior <- data.frame(x = pi_grid, y = posterior) |>
   ggtitle("Posterior") +
   theme_bw() +
   theme(panel.grid.minor = element_blank())
-
-
 ```
 
-
-```{r fig1, echo = FALSE, fig.width=10, fig.height=3, fig.cap="Distribucion del modelo bayesiano"}
-
+```{r fig1, echo = FALSE, fig.width=10, fig.height=3, fig.cap="Distribución del modelo bayesiano"}
 # Concatenar graficos
 combinado <- (plt_prior | plt_likelihood | plt_posterior)
 
@@ -210,7 +203,7 @@ combinado
 
 ```
 
-Partiendo de una creencia inicial en la que todos los valores posibles de $\pi_a$ son igualmente probables, se observa en el gráfico @ref(fig:fig1) que la verosimilitud ($likelihood$) y la distribución $posterior$ son similares. Esto se debe a que la elección del $prior$ no afecta directamente al $posterior$, lo que genera que tenga una forma distribucional similar a la de la verosimilitud de los datos.
+Partiendo de una creencia inicial en la que todos los valores posibles de $\pi_a$ son igualmente probables, se observa en la Figura @ref(fig:fig1) que la verosimilitud ($likelihood$) y el $posterior$ son similares. Esto se debe a que la elección del $prior$ no afecta directamente al $posterior$, lo que genera que tenga una forma distribucional similar a la de la verosimilitud de los datos.
 
 ### Niveles de mentira de los estudiantes
 
@@ -222,13 +215,11 @@ variable de interés con cada nivel de mentira
 ```{=latex}
 \FloatBarrier
 ```
-```{r fig2,echo=FALSE, fig.align = "center", warning=FALSE, fig.width = 7, fig.height = 3.2, fig.cap= "Posterior para diferentes niveles de mentira "}
+```{r fig2,echo=FALSE, fig.align = "center", warning=FALSE, fig.width = 7, fig.height = 3.2, fig.cap= "Posterior para diferentes niveles de mentira"}
 set.seed(1998)
 
 #Muestra base para los 6 procedimientos
 apuesta_b <- sample(poblacion$apuesta, n, replace = T)
-
-
 
 #Procedimiento sin mentira, con mentira de nivel mu (bajo, medio ,alto)
 muestra_mu <- function(mu, a_prior, b_prior, apuesta_b){
@@ -269,6 +260,11 @@ ggplot(datos, aes(x = p, y = posterior, color = Mentira)) +
 
 Del grafico @ref(fig:fig2) se puede ver como a medida que aumenta la probabilidad de que un estudiante mienta, se observó que la variabilidad del posterior es cada vez más chica, pero tiende a centrarse en un valor distinto al del parámetro de interés $\pi$.
 
+/////////////////////////////////////////////////////////////////////////
+YO DIRIA QUE NOS FALTA EXTENDER UN POCO MAS ESTA PARTE PENSEMOS ALGO MAS 
+/////////////////////////////////////////////////////////////////////////
+
+\newpage
 
 ### Aumento de la cantidad de simulaciones
 
@@ -276,7 +272,7 @@ Para poder tener unos resultados con más plausibilidad, se piensa en
 realizar 1000 simulaciones de los diferentes niveles de mentira y hacer
 su respectiva inferencia a cada nivel.
 
-```{r ,echo=FALSE, fig.align = "center", warning=FALSE, fig.width=4.5, fig.height=3.2}
+```{r fig3,echo=FALSE, fig.align = "center", warning=FALSE, fig.width=4.5, fig.height=3.2, fig.cap="Comparación entre los niveles de mentira"}
 set.seed(1998)
 
 int_m_0 <- matrix(NA, nrow = 1000, ncol = 2)
@@ -320,9 +316,7 @@ Niv_mentira <- tibble(
 ggplot(Niv_mentira, aes(x = reorder(Método, Cobertura), y = Cobertura)) +
   geom_col(fill = colores, alpha = 0.65) +
   geom_text(aes(label = round(Cobertura, 3)), vjust = -0.5, size = 4) +
-  labs(
-    title = expression("Comparación entre los niveles de " * mu),
-    subtitle = "Cobertura de intervalos del 90%",
+  labs(subtitle = "Cobertura de intervalos del 90%",
     x = "Nivel de mentira",
     y = "Cobertura"
   ) +
@@ -336,7 +330,7 @@ ggplot(Niv_mentira, aes(x = reorder(Método, Cobertura), y = Cobertura)) +
 
 
 ```
-
+@ref(fig:fig3)
 En este procedimiento se realizan intervalos de credibilidad para todos
 los niveles de mentira que se propusieron, en donde segun el nivel de
 mentira, el comportamiento para las muestras tomadas no incluyen el
@@ -426,7 +420,7 @@ Para sumar al análisis se hacen graficos de los $posterior$ utilizando
 distintos valores de $p$, por lo que se simulan distintas muestras para
 poder ver el comportamiento en cada $p$ propuesto
 
-```{r fig3,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 3.5, warning=FALSE}
+```{r fig4,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 3.5, warning=FALSE}
 set.seed(1998)
 
 #método warner
