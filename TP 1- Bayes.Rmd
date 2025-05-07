@@ -143,9 +143,9 @@ plt_prior <- data.frame(x = pi_grid, y = prior) |>
 
 ```
 
-#### Likelihood(función de verosimilitud):
+#### Likelihood:
 
-Esto es como se cree que se deberia ver el comportamiento de la variable
+El likelihood es una función de cuan probable es un valor especifico de la variable
 $Y_i$ en donde se piensa que la proporción de estudiantes que apuestan
 es del 40% $$ Y_i/\pi_a \sim Bi(n , \pi_a) $$
 
