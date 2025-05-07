@@ -113,7 +113,8 @@ poblacion <- data.frame(estudiante = seq(1:N), apuesta = sample(apuesta) )
 
 #### Prior:
 
-Se empieza con la creencia inicial de como se le asigna una credibilidad de como se distribuye la proporción de que los alumnos de la escuela participan en apuestas deportivas
+Considerando la naturaleza del parámetro, se busca asignar una credibilidad a priori a los posibles valores de $\pi_A$. Esta credibilidad puede modelarse mediante una distribución beta, con el objetivo de reflejar que todos los valores entre 0 y 1 son igualmente probables. En particular, se utilizo una distribución uniforme, es decir, una distribución beta con parámetros a = 1 y b = 1.
+
 $$ \pi_a \sim Beta(a = 1, b = 1) $$
 
 ```{=latex}
@@ -180,8 +181,7 @@ plt_likelihood <- data.frame(x = pi_grid, y = likelihood) |>
 
 #### Posterior:
 
-La combinación de la creencia inicial y el comportamiento pensado de la
-variable de interés $$ p(\pi_a/y) \propto p(y/\pi_a).p(\pi_a) $$
+La distribución a posteriori representa una combinación convexa entre la verosimilitud de los datos (Likelihood) y la credibilidad a priori. $$ p(\pi_a/y) \propto p(y/\pi_a).p(\pi_a) $$
 
 ```{r fig1, echo = FALSE, fig.width=10, fig.height=3, fig.cap="Función de dispersión"}
 # Obtener posterior
@@ -208,6 +208,7 @@ combined_plot <- (plt_prior | plt_likelihood | plt_posterior) +
 # Mostrar en pantalla
 print(combined_plot)
 ```
+@ref(fig:fig1) esto es para llamar a la imagen del grafico
 
 Partiendo de este gráfico se puede ver como el $Likelihood$ influye
 mucho en la respuesta final, ya que la creencia inicial era la
