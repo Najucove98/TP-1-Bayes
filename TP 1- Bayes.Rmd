@@ -363,57 +363,56 @@ apuestas deportivas?"
 Esta estrategia permite preservar la privacidad del encuentado y obtener
 una estimación de $\pi_a$.
 
-### Responder Si o No
+### Respuesta del estudiante
 
-A continuación se va a utilizar el método de Warner para calcular la
+A continuación se utilizó el método de Warner para calcular la
 probabilidad de que un estudiante responda afirmativamente, cualquiera
 sea la pregunta y tambien la probabilidad de que un estudiante responda
 negativamente, cualquiera sea la pregunta.
 
--   $y \text{ = } \text{El estudiante responde afirmativamente. } P(y) = \lambda_W$
+-   $y^* : \text{El estudiante responde afirmativamente. } P(y^*) = \lambda_W$
 
--   $\lambda_W$ = Probabilidad de que un estudiante responda
+-   $\lambda_W :$ Probabilidad de que un estudiante responda
     afirmativamente
 
--   $1 - \lambda_W$ = Probabilidad de que un estudiante no responda
+-   $1 - \lambda_W :$ Probabilidad de que un estudiante no responda
     afirmativamente
 
--   $Q \text{ = } \text{Pregunta 1 (¿participas en apuestas en linea?). } P(Q)=p \ conocido$
+-   $Q : \text{Pregunta 1 (¿participas en apuestas en linea?). } P(Q)=p \ conocido$
 
--   $Q^c \text{ = } \text{Pregunta 2 (¿no participas en apuestas en linea?). } P(Q^c)=(1-p) \ conocido$
+-   $Q^c : \text{Pregunta 2 (¿no participas en apuestas en linea?). } P(Q^c)=(1-p) \ conocido$
 
 Para la probabilidad de que un estudiante responda afirmativamente,
 tomamos el método de probabilidad total
-$$ \lambda_W = P(y) = P(y,Q) + P(y,Q^c)$$
-$$\\ = P(\text{y} \mid Q) \cdot P(Q) + P(\text{y} \mid Q^c) \cdot P(Q^c) $$
-$$\\= \pi_A \cdot p + (1 - \pi_A) \cdot (1 - p)$$
+$$ \lambda_W = P(y^*) = P(y^*,Q) + P(y^*,Q^c)$$
+$$\\ = P(y^* \mid Q) \cdot P(Q) + P(y^* \mid Q^c) \cdot P(Q^c) $$
+$$\\= \pi_a \cdot p + (1 - \pi_a) \cdot (1 - p)$$
 
 Para la probabilidad de que un estudiante responda de forma negativa
-$$ 1 - \lambda_W = P(y^c) = P(y^c,Q) + P(y^c,Q^c)$$
-$$\\ = P(y^c \mid Q) \cdot P(Q) + P(y^c \mid Q^c) \cdot P(Q^c) $$
+$$ 1 - \lambda_W = P((y^*)^c) = P((y^*)^c,Q) + P((y^*)^c,Q^c)$$
+$$\\ = P((y^*)^c \mid Q) \cdot P(Q) + P((y^*)^c \mid Q^c) \cdot P(Q^c) $$
 $$\\= (1 - \pi) \cdot p + \pi \cdot (1 - p)$$
 
 ### Formalizando el modelo
 
 Se empieza a formalizar cada parte del modelo con sus respectivas
-variables a utilizar, para continuar con un análisis de forma ordenada y
-fluida
+variables a utilizar
 
 Modelo razonable
 
--   $y$: El estudiante responde afirmativamente
+-   $y^*$: El estudiante responde afirmativamente
 
 -   $\pi_a$: Proporción de estudiantes que apuestan
 
 $$\text{Distribución del Prior}$$ $$\pi_a \ \sim \ Beta(a = 1, b = 1)$$
-$$\text{Distribución del Likelihood}$$
-$$y \text{| }\pi_a \sim \text{Bin}(n,\lambda_W), \text{ con } \lambda_W \text{ función de } \pi_a$$
+$$\text{Likelihood}$$
+$$y^* \text{| }\pi_a \sim \text{Bin}(n,\lambda_W), \text{ con } \lambda_W \text{ función de } \pi_a$$
 
 ### Planteo a partir de un Prior con distribución Uniforme
 
 Se realiza todo el procedimiento matemático correspondiente para la
-utilización de un $Prior$ con una distribución uniforme para llegar a un
-$Posterior$ exacto
+utilización de un $prior$ con una distribución uniforme para llegar a un
+$posterior$ exacto
 
 $$\pi_a \sim \text{Beta}(1,1)$$
 $$y \mid \pi_a \sim \text{Bin}(n, \lambda_W),\text{ con } \lambda_W \text{ función de } \pi_a\\$$
@@ -423,11 +422,11 @@ $$P(\pi_a \mid y) = \dfrac{[\pi_a p + (1 - \pi_a)(1 - p)]^y [1 - \pi_a p + (1 - 
 
 ### Visualización de Posterior
 
-Para sumar a el análisis se hacen graficos de los $Posterior$ utilizando
+Para sumar al análisis se hacen graficos de los $posterior$ utilizando
 distintos valores de $p$, por lo que se simulan distintas muestras para
 poder ver el comportamiento en cada $p$ propuesto
 
-```{r,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 3.5, warning=FALSE}
+```{r fig3,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 3.5, warning=FALSE}
 set.seed(1998)
 
 #método warner
