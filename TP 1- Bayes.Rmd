@@ -228,7 +228,7 @@ variable de interés con cada nivel de mentira
 ```{=latex}
 \FloatBarrier
 ```
-```{r,echo=FALSE, fig.align = "center", warning=FALSE, fig.width = 7, fig.height = 3.2}
+```{r fig2,echo=FALSE, fig.align = "center", warning=FALSE, fig.width = 7, fig.height = 3.2, fig.cap= "Posterior para diferentes niveles de mentira "}
 set.seed(1998)
 
 #Muestra base para los 6 procedimientos
@@ -262,7 +262,6 @@ datos <- data.frame(
 ggplot(datos, aes(x = p, y = posterior, color = Mentira)) +
   geom_line() +
   geom_area(aes(fill = Mentira), alpha = 0.4, position = "identity") +
-  ggtitle("Posterior") +
   scale_color_manual(values = colores) +
   scale_fill_manual(values = colores) +
   labs(x = expression(pi), y = expression("p(" ~ pi ~ "| y)")) +
@@ -274,11 +273,8 @@ ggplot(datos, aes(x = p, y = posterior, color = Mentira)) +
 
 ```
 
-A medida que aumenta la probabilidad asociada a los distintos valores de
-$\mu$, se observa que la variabilidad de las distribuciones a posteriori
-disminuye a medida que incrementa el nivel de mentira. Sin embargo,
-dichas distribuciones tienden a centrarse en un valor sesgado del
-parámetro de interés $\pi$.
+Del grafico @ref(fig:fig2) se puede ver como a medida que aumenta la probabilidad de que un estudiante mienta, se observó que la variabilidad del posterior es cada vez más chica, pero tiende a centrarse en un valor distinto al del parámetro de interés $\pi$.
+
 
 ### Aumento de la cantidad de simulaciones
 
