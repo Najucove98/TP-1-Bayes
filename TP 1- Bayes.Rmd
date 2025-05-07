@@ -143,8 +143,7 @@ plt_prior <- data.frame(x = pi_grid, y = prior) |>
 
 #### Likelihood(función de verosimilitud):
 
-Esto es como se cree que se deberia ver el comportamiento de la variable
-$Y_i$ en donde se piensa que la proporción de estudiantes que apuestan
+El likelihood es una función de cuan probable es un valor especifico de la variable $Y_i$ en donde se piensa que la proporción de estudiantes que apuestan
 es del 40% $$ Y_i/\pi_a \sim Bi(n , \pi_a) $$
 
 ```{=latex}
@@ -182,7 +181,7 @@ plt_likelihood <- data.frame(x = pi_grid, y = likelihood) |>
 La distribución a posteriori representa una combinación convexa entre la verosimilitud de los datos ($Likelihood$) y la credibilidad a $priori$. 
 $$ p(\pi_a/y) \propto p(y/\pi_a).p(\pi_a) $$
 
-```{r fig1, echo = FALSE, fig.width=10, fig.height=3, fig.cap="Función de dispersión"}
+```{r fig1, echo = FALSE, fig.width=10, fig.height=3, fig.cap="Distribucion del modelo bayesiano"}
 # Obtener posterior
 posterior <- dbeta(pi_grid, 1 + apuestan, 1 + n - apuestan)
 
