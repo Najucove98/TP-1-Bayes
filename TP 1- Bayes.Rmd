@@ -88,6 +88,7 @@ library(patchwork)
 library(ggplot2)
 library(patchwork)
 library(tibble)
+library(cowplot)
 
 # Semilla para control de repeticiones
 set.seed(1998)
@@ -112,8 +113,7 @@ poblacion <- data.frame(estudiante = seq(1:N), apuesta = sample(apuesta) )
 
 #### Prior:
 
-Se empieza con la creencia inicial de como se distribuye la proporción
-de que los alumnos de la escuela participan en apuestas deportivas
+Se empieza con la creencia inicial de como se le asigna una credibilidad de como se distribuye la proporción de que los alumnos de la escuela participan en apuestas deportivas
 $$ \pi_a \sim Beta(a = 1, b = 1) $$
 
 ```{=latex}
@@ -200,8 +200,13 @@ plt_posterior <- data.frame(x = pi_grid, y = posterior) |>
   theme(panel.grid.minor = element_blank())
 
 # Concatenar graficos
-plt_prior | plt_likelihood | plt_posterior
+combined_plot <- (plt_prior | plt_likelihood | plt_posterior) +
+  plot_annotation(
+    title = "Gráfico 1.1: etapas del estudio"
+  )
 
+# Mostrar en pantalla
+print(combined_plot)
 ```
 
 Partiendo de este gráfico se puede ver como el $Likelihood$ influye
