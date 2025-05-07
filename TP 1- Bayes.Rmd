@@ -179,8 +179,7 @@ plt_likelihood <- data.frame(x = pi_grid, y = likelihood) |>
 
 #### Posterior:
 
-La combinación de la creencia inicial y el comportamiento pensado de la
-variable de interés $$ p(\pi_a/y) \propto p(y/\pi_a).p(\pi_a) $$
+La distribución a posteriori representa una combinación convexa entre la verosimilitud de los datos (Likelihood) y la credibilidad a priori. $$ p(\pi_a/y) \propto p(y/\pi_a).p(\pi_a) $$
 
 ```{r fig1, echo = FALSE, fig.width=10, fig.height=3, fig.cap="Función de dispersión"}
 # Obtener posterior
