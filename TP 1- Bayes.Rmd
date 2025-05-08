@@ -367,14 +367,14 @@ $$\\ = P(y^* \mid Q) \cdot P(Q) + P(y^* \mid Q^c) \cdot P(Q^c) $$
 $$\\= \pi_a \cdot p + (1 - \pi_a) \cdot (1 - p)$$
 
 Para la probabilidad de que un estudiante responda de forma negativa
-$$ 1 - \lambda_W = P((y^*)^c) = P((y^*)^c,Q) + P((y^*)^c,Q^c)$$
-$$\\ = P((y^*)^c \mid Q) \cdot P(Q) + P((y^*)^c \mid Q^c) \cdot P(Q^c) $$
-$$\\= (1 - \pi) \cdot p + \pi \cdot (1 - p)$$
+$$ 1 - \lambda_W = P(y^{*c}) = P(y^{*c},Q) + P(y^{*c},Q^c)$$
+$$\\ = P(y^{*c} \mid Q) \cdot P(Q) + P(y^{*c} \mid Q^c) \cdot P(Q^c) $$
+$$\\= (1 - \pi_a) \cdot p + \pi_a \cdot (1 - p)$$
 
 ### Formalizando el modelo
 
-Se empieza a formalizar cada parte del modelo con sus respectivas
-variables a utilizar
+Se detalla el modelo formalizado para cada parte del modelo con sus respectivas variables a utilizar.
+PENSAR BIEN QUE MAS SE PUEDE AGREGAR
 
 Modelo razonable
 
@@ -382,21 +382,20 @@ Modelo razonable
 
 -   $\pi_a$: Proporción de estudiantes que apuestan
 
-$$\text{Distribución del Prior}$$ $$\pi_a \ \sim \ Beta(a = 1, b = 1)$$
+$$\text{Prior}$$ $$\pi_a \ \sim \ Beta(a = 1, b = 1)$$
 $$\text{Likelihood}$$
 $$y^* \text{| }\pi_a \sim \text{Bin}(n,\lambda_W), \text{ con } \lambda_W \text{ función de } \pi_a$$
 
 ### Planteo a partir de un Prior con distribución Uniforme
 
-Se realiza todo el procedimiento matemático correspondiente para la
-utilización de un $prior$ con una distribución uniforme para llegar a un
-$posterior$ exacto
+Se realiza todo el procedimiento matemático correspondiente para la utilización de un $prior$ con una distribución uniforme para llegar a un $posterior$ exacto
 
 $$\pi_a \sim \text{Beta}(1,1)$$
-$$y \mid \pi_a \sim \text{Bin}(n, \lambda_W),\text{ con } \lambda_W \text{ función de } \pi_a\\$$
-$$P(\pi_a \mid y) = \dfrac{P(y \mid \pi_a) \cdot P(\pi_a)}{P(y)} \quad \text{Por regla de Bayes}$$
-$$P(\pi_a \mid y) = \dfrac{\lambda^y (1 - \lambda)^{N - y}}{\int \lambda^y (1 - \lambda)^{N - y} \, d\lambda}\\$$
-$$P(\pi_a \mid y) = \dfrac{[\pi_a p + (1 - \pi_a)(1 - p)]^y [1 - \pi_a p + (1 - \pi_a)(1 - p)]^{N - y} (1 - 2p)}{\int B(1 - p; y + 1; N - y + 1) - B(p; y + 1; N - y + 1)}\\$$
+$$y^* \mid \pi_a \sim \text{Bin}(n, \lambda_W),\text{ con } \lambda_W \text{ función de } \pi_a\\$$
+$$P(\pi_a \mid y^*) = \dfrac{P(y^* \mid \pi_a) \cdot P(\pi_a)}{P(y^*)} \quad \text{Por regla de Bayes}$$
+$$P(\pi_a \mid y^*) =  \dfrac{\binom{N}{y^*} \lambda^{y^*} (1 - \lambda)^{N - y^*}}{\int \binom{N}{y^*} \lambda^{y^*} (1 - \lambda)^{N - y^*} \, d\lambda}\\$$
+$$P(\pi_a \mid y^*) = \dfrac{[\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*} (1 - 2p)}{\int B(1 - p; y^* + 1; N - y^* + 1) - B(p; y + 1; N - y^* + 1)}\\$$
+Falta continuar con la integral del denominador
 
 ### Visualización de Posterior
 
