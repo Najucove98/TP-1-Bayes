@@ -620,8 +620,6 @@ A medida que aumenta la cantidad de estudaintes que apuestan en la poblacion se 
 
 Cuando el valor de $p$ es más cercano a 0.5 el método Warner presenta una gran incertidumbre respecto a cuál es la pregunta  realizada a cada persona, lo que dificulta el discernimiento de quiénes realmente participan de la actividad sensible. En cambio cuando el valor de p se aleja de 0.5, en particular hacia los extremos, esta ambigüedad en las respuestas disminuye, lo que otorga una mayor claridad a la hora de interpretar los resultados respecto a  la proporción de personas que realizan apuestas online. 
 
-### Recursos para proximos análisis
-
 Se consideró la opción de realizar una función que permita extender los resultados del análisis realizado. De modo de poder replicar este estudio y sus inferencias de forma aproximada, pudiendo considerar un prior con una distribución diferente a la beta(1,1).
 
 ```{r , fig.align = "center", fig.width = 5, fig.height = 4, warning=FALSE}
@@ -706,10 +704,9 @@ Estos valores permiten establecer el vínculo entre las respuestas
 observadas y la proporción real de interés en la población.
 
 $$\text{Prior}$$ $$ \pi_a \sim Beta(a = 1, b = 1) \\$$
-$$\text{Distribución del Likelihood}$$
-$$\text{y| }\pi\_a \sim \text{Binomial}(n, \lambda_G), \text{ con } \lambda_G \text{ función de } \pi_a \\$$
+$$\text{Likelihood}$$
+$$y^*\text{| }\pi_a \sim \text{Binomial}(n, \lambda_G), \text{ con } \lambda_G \text{ función de } \pi_a \\$$
 
-### Crear una función para el método Greenberg
 
 Una vez conocida la probabilidad de respuesta afirmativa en el marco del
 método de Greenberg, es posible avanzar en la construcción de un modelo
@@ -738,7 +735,7 @@ posterior_green <- function(pi, p, a, b, pi_b = 7/12){
   # Construimos el denominador del posterior aproximado
   delta <- diff(pi_grid)[1] 
   denom <- sum(num) * delta
-  # Obtenemos el Posterior exacto
+  # Obtenemos el Posterior aproximado
   posterior <- num / denom
   return(posterior)
 }
