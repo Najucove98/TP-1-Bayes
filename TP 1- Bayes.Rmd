@@ -264,7 +264,7 @@ Del grafico @ref(fig:fig2) se puede ver como a medida que aumenta la probabilida
 
 ### Aumento de la cantidad de simulaciones
 
-Para interpretar mejor los resultados de la inferencia, se recurre a las simulaciones de 1000 muestras del $posterior$ para cada nivel de mentira $\mu$, con el interés de estimar los intervalos de credibilidad, los cuales buscan determinar qué cobertura de los intervalos del 90% para cada posterior contiene al verdadero parámetro $\pi_a$.
+Para interpretar mejor los resultados de la inferencia, se recurre a las simulaciones de 1000 muestras del $posterior$ para cada nivel de mentira $\mu$, con el interés de estimar los intervalos de credibilidad, los cuales buscan determinar qué cantidad de los intervalos del 90% para cada posterior contiene al verdadero parámetro $\pi_a$.
 
 ```{r fig3,echo=FALSE, fig.align = "center", warning=FALSE, fig.width=4.5, fig.height=3.2, fig.cap="Comparación entre los niveles de mentira"}
 set.seed(1998)
@@ -325,7 +325,7 @@ ggplot(Niv_mentira, aes(x = reorder(Método, Cobertura), y = Cobertura)) +
 
 ```
 
-Como se observa en la Figura @ref(fig:fig3), en las muestras generadas a partir de una población donde el nivel de $\mu$ es nulo, la cobertura de los intervalos de credibilidad para el verdadero valor del parámetro es superior en comparación con los niveles más altos de $\mu$. Por lo tanto, el supuesto de no mentira tiene es influyente en las inferencias realizadas sobre el parámetro $\pi_a$ para las distintas técnicas de respuesta aleatorizada.
+Como se observa en la Figura @ref(fig:fig3), en las muestras generadas a partir de una población donde el nivel de $\mu$ es nulo, la cobertura de los intervalos de credibilidad para el verdadero valor del parámetro es superior en comparación con los niveles más altos de $\mu$. Por lo tanto, el supuesto de no mentira es influyente en las inferencias realizadas sobre el parámetro $\pi_a$ para las distintas técnicas de respuesta aleatorizada.
 
 
 ```{=latex}
@@ -343,10 +343,7 @@ una estimación de $\pi_a$.
 
 ### Respuesta del estudiante
 
-A continuación se utilizó el método de Warner para calcular la
-probabilidad de que un estudiante responda afirmativamente, cualquiera
-sea la pregunta y tambien la probabilidad de que un estudiante responda
-negativamente, cualquiera sea la pregunta.
+A continuación se utilizó el método de Warner para calcular la probabilidad de que un estudiante responda afirmativamente, cualquiera sea la pregunta y tambien la probabilidad de que un estudiante responda negativamente, cualquiera sea la pregunta.
 
 -   $y^* : \text{El estudiante responde afirmativamente. } P(y^*) = \lambda_W$
 
@@ -371,12 +368,9 @@ $$ 1 - \lambda_W = P(y^{*c}) = P(y^{*c},Q) + P(y^{*c},Q^c)$$
 $$\\ = P(y^{*c} \mid Q) \cdot P(Q) + P(y^{*c} \mid Q^c) \cdot P(Q^c) $$
 $$\\= (1 - \pi_a) \cdot p + \pi_a \cdot (1 - p)$$
 
-### Formalizando el modelo
+### Modelo razonable
 
-Se detalla el modelo formalizado para cada parte del modelo con sus respectivas variables a utilizar.
-PENSAR BIEN QUE MAS SE PUEDE AGREGAR
-
-Modelo razonable
+En base al análisis realizado anteriormente de se planteó el siguiente modelo para la generación de los datos.
 
 -   $y^*$: El estudiante responde afirmativamente
 
@@ -395,7 +389,7 @@ $$y^* \mid \pi_a \sim \text{Bin}(n, \lambda_W),\text{ con } \lambda_W \text{ fun
 $$P(\pi_a \mid y^*) = \dfrac{P(y^* \mid \pi_a) \cdot P(\pi_a)}{P(y^*)} \quad \text{Por regla de Bayes}$$
 $$P(\pi_a \mid y^*) =  \dfrac{\binom{N}{y^*} \lambda^{y^*} (1 - \lambda)^{N - y^*}}{\int \binom{N}{y^*} \lambda^{y^*} (1 - \lambda)^{N - y^*} \, d\lambda}\\$$
 $$P(\pi_a \mid y^*) = \dfrac{[\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*} (1 - 2p)}{\int B(1 - p; y^* + 1; N - y^* + 1) - B(p; y + 1; N - y^* + 1)}\\$$
-Falta continuar con la integral del denominador
+Falta cambiar el denomidar como Z y de ahi desarrollar la integral
 
 ### Visualización de Posterior
 
@@ -403,7 +397,7 @@ Para sumar al análisis se hacen graficos de los $posterior$ utilizando
 distintos valores de $p$, por lo que se simulan distintas muestras para
 poder ver el comportamiento en cada $p$ propuesto
 
-```{r fig4,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 3.5, warning=FALSE}
+```{r fig4,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 3.5, warning=FALSE, fig.cap="Posterior para distintos valores de p"}
 set.seed(1998)
 
 #método warner
@@ -461,9 +455,9 @@ datos <- data.frame(
 ggplot(datos, aes(x = p, y = posterior, color = Niveles)) +
   geom_line() +
   geom_area(aes(fill = Niveles), alpha = 0.4, position = "identity") +
-  ggtitle("Posterior") +
   scale_color_manual(values = colores) +
   scale_fill_manual(values = colores) +
+  geom_vline(xintercept = 0.4, linetype = "dashed", color = "red", size = 0.5) +
   labs(x = expression(pi), y = expression("p(" ~ pi ~ "| y)")) +
   theme_bw() +
   theme(
@@ -475,21 +469,9 @@ ggplot(datos, aes(x = p, y = posterior, color = Niveles)) +
 
 ```
 
-A partir de la simulación del método de Warner utilizando distintos
-valores de $p$, se observa que el comportamiento de las distribuciones a
-posteriori varía notablemente según el nivel de $p$ utilizado. En
-particular, cuando se utilizan valores extremos de $p$, las
-distribuciones a posteriori tienden a concentrarse en torno al verdadero
-valor de $\pi$, presentando menor variabilidad. Esto indica que, en
-estos casos, la información proporciónada por la muestra es más
-determinante para actualizar la creencia sobre el parámetro de interés.
+A partir de la simulación del método de Warner utilizando distintos valores de $p$, se observó que el comportamiento de las distribuciones a posteriori varía notablemente según el nivel de $p$ utilizado. En particular, cuando se utilizan valores extremos de $p$, como $p = 0.3$ y $p = 0.4$, las distribuciones a posteriori tiende a concentrarse en torno al verdadero valor de $\pi_a$, presentando menor variabilidad. Esto indica que, en estos casos, la información proporcionada por la muestra es más determinante para actualizar la creencia sobre el parámetro de interés.
 
-Por otro lado, para valores intermedios de $p$, las distribuciones
-resultan más dispersas, reflejando una mayor incertidumbre en la
-estimación de $\pi$. En resumen, el valor de $p$ influye directamente en
-la precisión y sesgo de las distribuciones a posteriori, lo cual debe
-ser cuidadosamente considerado al momento de implementar este tipo de
-técnicas en estudios empíricos.
+Por otro lado, para los valores de $p$ más centrales, como $p = 0.45$ o $p = 0.6$, las distribuciones resultan más dispersas, reflejando una mayor incertidumbre en la estimación de $\pi_a$. En resumen, el valor de $p$ influye directamente en la precisión de la distribución a posteriori, por lo que debía ser cuidadosamente considerado al momento de implementar este tipo de técnicas en estudios empíricos. Además de la influencia del valor de $p$, también se debe considerar el rol que juega la aleatoriedad de las muestras obtenidas.
 
 ### ¿Y si la población cambia?
 
