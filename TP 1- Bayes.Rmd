@@ -258,19 +258,13 @@ ggplot(datos, aes(x = p, y = posterior, color = Mentira)) +
 
 ```
 
-Del grafico @ref(fig:fig2) se puede ver como a medida que aumenta la probabilidad de que un estudiante mienta, se observó que la variabilidad del posterior es cada vez más chica, pero tiende a centrarse en un valor distinto al del parámetro de interés $\pi$.
-
-/////////////////////////////////////////////////////////////////////////
-YO DIRIA QUE NOS FALTA EXTENDER UN POCO MAS ESTA PARTE PENSEMOS ALGO MAS 
-/////////////////////////////////////////////////////////////////////////
+Del grafico @ref(fig:fig2) se puede ver como a medida que aumenta la probabilidad de que un estudiante mienta, se observó que la variabilidad del $posterior$ es cada vez más chica, pero tiende a centrarse en un valor sesgado distinto al del parámetro de interés $\pi$.
 
 \newpage
 
 ### Aumento de la cantidad de simulaciones
 
-Para poder tener unos resultados con más plausibilidad, se piensa en
-realizar 1000 simulaciones de los diferentes niveles de mentira y hacer
-su respectiva inferencia a cada nivel.
+Para interpretar mejor los resultados de la inferencia, se recurre a las simulaciones de 1000 muestras del $posterior$ para cada nivel de mentira $\mu$, con el interés de estimar los intervalos de credibilidad, los cuales buscan determinar qué cobertura de los intervalos del 90% para cada posterior contiene al verdadero parámetro $\pi_a$.
 
 ```{r fig3,echo=FALSE, fig.align = "center", warning=FALSE, fig.width=4.5, fig.height=3.2, fig.cap="Comparación entre los niveles de mentira"}
 set.seed(1998)
@@ -330,19 +324,9 @@ ggplot(Niv_mentira, aes(x = reorder(Método, Cobertura), y = Cobertura)) +
 
 
 ```
-@ref(fig:fig3)
-En este procedimiento se realizan intervalos de credibilidad para todos
-los niveles de mentira que se propusieron, en donde segun el nivel de
-mentira, el comportamiento para las muestras tomadas no incluyen el
-valor verdadero de la proporción de alumnos que hacen apuestas online.
 
-Como se puede ver en el gráfico, si los estudiantes no mienten, los
-intervalos de credibilidad cubren el verdadero valor de la proporción de
-estudiantes que apuestan en un 95.9%, sin embargo si se ve cuando los
-estudiantes tienen una probabilidad de mentir de 0.45 los intervalos de
-credibilidad cubren el verdadero valor de la proporción de estudiantes
-que apuestan desciende a 3.8% lo cual significa que es una muestra que
-no provee de información util y veraz para el análisis del estudio.
+Como se observa en la Figura @ref(fig:fig3), en las muestras generadas a partir de una población donde el nivel de $\mu$ es nulo, la cobertura de los intervalos de credibilidad para el verdadero valor del parámetro es superior en comparación con los niveles más altos de $\mu$. Por lo tanto, el supuesto de no mentira tiene es influyente en las inferencias realizadas sobre el parámetro $\pi_a$ para las distintas técnicas de respuesta aleatorizada.
+
 
 ```{=latex}
 \clearpage
