@@ -469,17 +469,13 @@ ggplot(datos, aes(x = p, y = posterior, color = Niveles)) +
 
 ```
 
-A partir de la simulación del método de Warner utilizando distintos valores de $p$, se observó que el comportamiento de las distribuciones a posteriori varía notablemente según el nivel de $p$ utilizado. En particular, cuando se utilizan valores extremos de $p$, como $p = 0.3$ y $p = 0.4$, las distribuciones a posteriori tiende a concentrarse en torno al verdadero valor de $\pi_a$, presentando menor variabilidad. Esto indica que, en estos casos, la información proporcionada por la muestra es más determinante para actualizar la creencia sobre el parámetro de interés.
+A partir de la simulación del método de Warner utilizando distintos valores de $p$, se observó en la Figura @ref(fig:fig4) que el comportamiento de las distribuciones a posteriori varía notablemente según el nivel de $p$ utilizado. En particular, cuando se utilizan valores extremos de $p$, como $p = 0.3$ y $p = 0.4$, las distribuciones a posteriori tiende a concentrarse en torno al verdadero valor de $\pi_a$, presentando menor variabilidad. Esto indica que, en estos casos, la información proporcionada por la muestra es más determinante para actualizar la creencia sobre el parámetro de interés.
 
 Por otro lado, para los valores de $p$ más centrales, como $p = 0.45$ o $p = 0.6$, las distribuciones resultan más dispersas, reflejando una mayor incertidumbre en la estimación de $\pi_a$. En resumen, el valor de $p$ influye directamente en la precisión de la distribución a posteriori, por lo que debía ser cuidadosamente considerado al momento de implementar este tipo de técnicas en estudios empíricos. Además de la influencia del valor de $p$, también se debe considerar el rol que juega la aleatoriedad de las muestras obtenidas.
 
 ### ¿Y si la población cambia?
 
-Esto es un aspecto muy importante a tener en cuenta, hasta el momento
-todo el análisis se ha partido teniendo una población con un valor de
-$\pi$ definido, si cambiamos esto seguramente cambiaran nuestras
-inferencias y con estas nuestras conclusiones por lo que el siguiente
-paso a realizar es cambiar este $\pi = 0.4$
+Lo que es un  aspecto crucial a considerar,  hasta este punto, el análisis se ha desarrollado bajo el supuesto de una población con un valor de $\pi_a$ definido. Sin embargo, la modificación de este valor de $\pi_a$ sin duda influirá en nuestras inferencias y, por ende, en las conclusiones.
 
 ```{r,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 4, warning=FALSE}
 set.seed(2198)
@@ -604,7 +600,7 @@ for (j in pi_pos) {
 }
 ```
 
-```{r,echo=FALSE, warning=FALSE, message=FALSE, fig.align = "center", fig.width = 6, fig.height = 3.8}
+```{r fig5,echo=FALSE, warning=FALSE, message=FALSE, fig.align = "center", fig.width = 6, fig.height = 3.8, fig.cap="Posterior segun distintas poblaciones"}
 
 # Concatenar graficos
 # Cargar si no lo hiciste
@@ -618,32 +614,15 @@ grid.arrange(graficos_post[[3]], graficos_post[[4]], nrow = 2)
 
 ```
 
-A pesar de que las poblaciones son distintas, se puede ver como para la
-mayoria de graficos en general el comportamiento más variable es el de
-cuando $p = 0.45$ lo cual nos ayuda a entender que si el $p$ es cercano
-a 0.5 menos información de la realidad nos puede aportar cada muestra
-aumentando la variabilidad de la incertidumbre para el parámetro de
-interés $\pi$
+A pesar de que las poblaciones son distintas, se puede ver como para la mayoria de graficos en general el comportamiento más variable es cuando $p = 0.45$ lo cual nos ayuda a entender que si el $p$ es cercano a 0.5 menos información de la realidad nos puede aportar cada muestra aumentando la variabilidad de la incertidumbre para el parámetro de interés $\pi_a$
 
-A medida que aumenta la cantidad de apostadores en la poblacion se
-observa que para los diferentes $p$ la variabilidad gira en torno al
-verdadero valor de $\pi$ para los casos más extremos de $p$ (0.3 y 0.8),
-mientras que para los caso de $p$ cercanos a 0.5 (0.45 y 0.6) como son
-muy variables no podemos obtener una buena precisión al verdadero valor.
+A medida que aumenta la cantidad de estudaintes que apuestan en la poblacion se observa que para los diferentes $p$ la variabilidad gira en torno al verdadero valor de $\pi_a$ para los casos más extremos, $p = 0.3$ y $p = 0.8$. Mientras que para los casos de $p = 0.45$ y $p = 0.6$ se nota una mayor variabilidad entre las poblaciones como son muy variables no podemos obtener una buena precisión al verdadero valor.
 
-El método de Warner es más consistente cuando el valor de $p$ se aleja
-de 0.5. Esto significa que, para mecanismos aleatorizados en los que se
-obtiene una de las preguntas con probabilidad $p$, el método de Warner
-ofrece mejores resultados en comparación con aquellos mecanismos cuando
-$p$ está cerca de 0.5.
+Cuando el valor de $p$ es más cercano a 0.5 el método Warner presenta una gran incertidumbre respecto a cuál es la pregunta  realizada a cada persona, lo que dificulta el discernimiento de quiénes realmente participan de la actividad sensible. En cambio cuando el valor de p se aleja de 0.5, en particular hacia los extremos, esta ambigüedad en las respuestas disminuye, lo que otorga una mayor claridad a la hora de interpretar los resultados respecto a  la proporción de personas que realizan apuestas online. 
 
 ### Recursos para proximos análisis
 
-Desde el principio se estableció un $Prior$ con distribución Beta con
-comportamiento de una Uniforme, una buena practica seria hacer una
-función de manera que se le puedan establecer unos parametros y esta
-devuelva las inferencias al menos de manera aproximada y para
-simplificar un poco los parametros de esta, usando la grilla de $\pi_a$
+Se consideró la opción de realizar una función que permita extender los resultados del análisis realizado. De modo de poder replicar este estudio y sus inferencias de forma aproximada, pudiendo considerar un prior con una distribución diferente a la beta(1,1).
 
 ```{r , fig.align = "center", fig.width = 5, fig.height = 4, warning=FALSE}
 #función del posterior para un prior no necesariamente uniforme
@@ -658,7 +637,7 @@ posterior_war <- function(pi, p, a, b){
   # Construimos el denominador del posterior aproximado
   delta <- diff(pi_grid)[1] 
   denom <- sum(num) * delta
-  # Obtenemos el Posterior exacto
+  # Obtenemos el Posterior aproximado
   posterior <- num / denom
   return(posterior)
 }
@@ -680,7 +659,7 @@ mes con 31 días?)
 
 Esta estrategia permite preservar la privacidad del encuentado y obtener
 una estimación de $\pi_a$. Se asume que se conoce de antemano la
-proporción de personas que pertenecen al tema no relacionado
+proporción de personas que pertenecen a la categoria B no relacionado al tema de interes
 ($\pi_B = \dfrac{7}{12}$)
 
 En el marco del método propuesto por Greenberg, es de interés conocer la
@@ -692,41 +671,41 @@ probabilidades, la respuesta observada no refleja directamente la
 verdadera pertenencia del individuo a una categoría, sino una
 combinación probabilística de ambas posibilidades.
 
--   $y \text{ = } \text{El estudiante responde afirmativamente } P(y) = \lambda_G$
+-   $y^* \text{ : } \text{El estudiante responde afirmativamente } P(y^*) = \lambda_G$
 
--   $\lambda_G$ = Probabilidad de que un estudiante responda
+-   $\lambda_G$ : Probabilidad de que un estudiante responda
     afirmativamente
 
--   $1 - \lambda_G$ = Probabilidad de que un estudiante no responda
+-   $1 - \lambda_G$ : Probabilidad de que un estudiante no responda
     afirmativamente
 
--   $\pi_a$ = Probabilidad de que un estudiante realice apuestas online
+-   $\pi_a$ : Probabilidad de que un estudiante realice apuestas online
 
--   $\pi_B \text{ = } \text{Probabilidad de que un estudiante pertenezca a la categoria B. } P(\pi_b) = \dfrac{7}{12}$
+-   $\pi_B \text{ : } \text{Probabilidad de que un estudiante pertenezca a la categoria B. } P(\pi_b) = \dfrac{7}{12}$
 
--   $Q_1 \text{ = } \text{Pregunta 1 (¿Participas en apuestas en linea?). } P(Q)=p \ conocido$
+-   $Q_1 \text{ : } \text{Pregunta 1 (¿Participas en apuestas en linea?). } P(Q)=p \ \text{conocido}$
 
--   $Q_2 \text{ = } \text{Pregunta 2 (¿Es cierto que naciste en un mes con 31 dias?). } P(Q_2)=(1-p) \ conocido$
+-   $Q_2 \text{ : } \text{Pregunta 2 (¿Es cierto que naciste en un mes con 31 dias?). } P(Q_2)=(1-p) \ conocido$
 
 Para la probabilidad de que un estudiante responda afirmativamente,
 tomamos el método de probabilidad total
 
-$$ \lambda_G = P(y) = P(y,Q_1) + P(y,Q_2)$$
-$$\\ = P(\text{y} \mid Q_1) \cdot P(Q_1) + P(\text{y} \mid Q_2) \cdot P(Q_2) $$
+$$ \lambda_G = P(y^*) = P(y^*,Q_1) + P(y^*,Q_2)$$
+$$\\ = P(y^* \mid Q_1) \cdot P(Q_1) + P(y^* \mid Q_2) \cdot P(Q_2) $$
 $$\\= \pi_a \cdot p + \pi_B \cdot (1 - p)$$
 $$\\= \pi_a \cdot p + \dfrac{7}{12} \cdot (1 - p)$$
 
 Para la probabilidad de que un estudiante responda de forma negativa
 
-$$ P(y^c) = P(y^c,Q_1) + P(y^c,Q_2)$$
-$$\\= P(y^c \mid Q_1) \cdot P(Q_1) + P(y^c \mid Q_2) \cdot P(Q_2)$$
+$$ P(y^{*c}) = P(y^{*c},Q_1) + P(y^{*c},Q_2)$$
+$$\\= P(y^{*c} \mid Q_1) \cdot P(Q_1) + P(y^{*c} \mid Q_2) \cdot P(Q_2)$$
 $$\\= (1 - \pi_a) \cdot p + (1 - \pi_B) \cdot (1 - p)$$
 $$\\= (1 - \pi_a) \cdot p + \dfrac{5}{12} \cdot (1 - p)$$
 
 Estos valores permiten establecer el vínculo entre las respuestas
 observadas y la proporción real de interés en la población.
 
-$$\text{Distribución del Prior}$$ $$ \pi_a \sim Beta(a = 1, b = 1) \\$$
+$$\text{Prior}$$ $$ \pi_a \sim Beta(a = 1, b = 1) \\$$
 $$\text{Distribución del Likelihood}$$
 $$\text{y| }\pi\_a \sim \text{Binomial}(n, \lambda_G), \text{ con } \lambda_G \text{ función de } \pi_a \\$$
 
