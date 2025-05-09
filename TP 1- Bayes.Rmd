@@ -208,7 +208,7 @@ Partiendo de una creencia inicial en la que todos los valores posibles de $\pi_a
 ### Niveles de mentira de los estudiantes
 
 Si se toma en cuenta de que hay una probabilidad de que los estudiantes
-mientan, se simula muestras de estudiantes con distintos niveles de
+mientan, se simularon muestras de estudiantes con distintos niveles de
 mentira bajo, medio y alto; para poder ver el comportamiento de la
 variable de interés con cada nivel de mentira
 
@@ -258,7 +258,7 @@ ggplot(datos, aes(x = p, y = posterior, color = Mentira)) +
 
 ```
 
-Del grafico @ref(fig:fig2) se puede ver como a medida que aumenta la probabilidad de que un estudiante mienta, se observó que la variabilidad del $posterior$ es cada vez más chica, pero tiende a centrarse en un valor sesgado distinto al del parámetro de interés $\pi$.
+De la Figura @ref(fig:fig2) se puede ver como a medida que aumenta la probabilidad de que un estudiante mienta, se observó que la variabilidad del $posterior$ es cada vez más chica, pero tiende a centrarse en un valor sesgado distinto al del parámetro de interés $\pi$.
 
 \newpage
 
@@ -386,13 +386,18 @@ Se realiza todo el procedimiento matemático correspondiente para la utilizació
 
 $$\pi_a \sim \text{Beta}(1,1)$$
 $$y^* \mid \pi_a \sim \text{Bin}(n, \lambda_W),\text{ con } \lambda_W \text{ función de } \pi_a\\$$
-$$P(\pi_a \mid y^*) = \dfrac{P(y^* \mid \pi_a) \cdot P(\pi_a)}{P(y^*)} \quad \text{Por regla de Bayes}$$
-$$P(\pi_a \mid y^*) =  \dfrac{\binom{N}{y^*} \lambda^{y^*} (1 - \lambda)^{N - y^*}}{\int_{0}^{1} \binom{N}{y^*} \lambda^{y^*} (1 - \lambda)^{N - y^*} \, d\lambda}\\$$
-$$P(\pi_a \mid y^*) = \dfrac{[\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*}}{\int_{0}^{1} [\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*}}\\$$
-$$P(\pi_a \mid y^*) = \dfrac{[\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*} (1 - 2p)}{Z}\\$$
-$$\text{Donde Z = } \int_{0}^{1} [\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*} d(\pi_a p + (1 - \pi_a)(1 - p))$$
-$$\text{Aplicando sustitución se tiene Z = }\int_{1-p}^{p} \lambda_W^{y^*} (1 - \lambda_W)^{N-y^*} \dfrac{d\lambda_W}{2p-1} $$
-$$Z = \dfrac{1}{2p-1}[\int_{0}^{p} \lambda_W^{(y^*+1)-1} (1 - \lambda_W)^{(N-y^*+1)-1} d\lambda_W - \int_{0}^{1-p} \lambda_W^{(y^*+1)-1} (1 - \lambda_W)^{(N-y^*+1)-1} d\lambda_W]$$
+$$P(\pi_a \mid y^*) = \dfrac{P(y^* \mid \pi_a) \cdot P(\pi_a)}{\int_{0}^{1} P(y^* \mid \pi_a)d\pi_a} \quad \text{Por regla de Bayes}$$
+$$P(\pi_a \mid y^*) =  \dfrac{\binom{N}{y^*} \lambda^{y^*} (1 - \lambda)^{N - y^*}}{\int_{0}^{1} \binom{N}{y^*} \lambda^{y^*} (1 - \lambda)^{N - y^*} \, d\pi_a}\\$$
+$$P(\pi_a \mid y^*) =  \dfrac{ \lambda^{y^*} (1 - \lambda)^{N - y^*}}{\int_{0}^{1} \lambda^{y^*} (1 - \lambda)^{N - y^*} \, d\pi_a}\\$$
+
+$$P(\pi_a \mid y^*) = \dfrac{\lambda^{y^*} (1 - \lambda)^{N - y^*}}{Z}\\$$
+$$P(\pi_a \mid y^*) = \dfrac{[\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*}}{Z}\\$$
+
+$$\text{Donde Z = } \int_{0}^{1} [\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*} d\pi_a$$
+$$\text{Aplicando sustitución:} \\ \lambda = \pi_a p + (1 - \pi_a)(1 - p) \\  d\lambda = 2p \ - \ 1 \ d\pi_a \implies d\pi_a = \dfrac{d\lambda}{2p-1}$$
+$$\text{Cuando }\pi_a = 0, \text{ luego } \lambda = (1-p) \text{ y cuando }\pi_a =1, \text{ luego } \lambda= p$$
+$$\text{Quedando Z = } \int_{1-p}^{p} \lambda^{y^*} (1 - \lambda)^{N - y^*} \dfrac{ d\lambda}{2p -1}$$
+$$\text{Z = } \dfrac{1}{2p -1} \left[\int_{0}^{p} \lambda^{(y^*+1)-1} (1 - \lambda)^{(N - y^*+1)-1} d\lambda - \int_{0}^{1-p} \lambda^{(y^*+1)-1} (1 - \lambda)^{(N - y^*+1)-1} d\lambda\right]$$
 $$\text{Sabiendo que B(x, a, b) =} \int_{0}^{x} t^{a-1}(1 - t)^{b-1} dt \text{, es la función beta incompleta se tiene que:}$$
 $$Z = \dfrac{B(p,\ y^*+1,\ N-y^* +1)\ -\ B(1-p,\ y^*+1,\ N-y^* +1)}{2p-1}$$
 
@@ -400,8 +405,8 @@ $$Z = \dfrac{B(p,\ y^*+1,\ N-y^* +1)\ -\ B(1-p,\ y^*+1,\ N-y^* +1)}{2p-1}$$
 
 ### Visualización de Posterior
 
-Para sumar al análisis se hacen graficos de los $posterior$ utilizando
-distintos valores de $p$, por lo que se simulan distintas muestras para
+Para sumar al análisis se realizaron gráficos de los $posterior$ utilizando
+distintos valores de $p$, por lo que se simularon distintas muestras para
 poder ver el comportamiento en cada $p$ propuesto
 
 ```{r fig4,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 3.5, warning=FALSE, fig.cap="Posterior para distintos valores de p"}
