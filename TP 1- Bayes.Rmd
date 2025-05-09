@@ -387,9 +387,16 @@ Se realiza todo el procedimiento matemático correspondiente para la utilizació
 $$\pi_a \sim \text{Beta}(1,1)$$
 $$y^* \mid \pi_a \sim \text{Bin}(n, \lambda_W),\text{ con } \lambda_W \text{ función de } \pi_a\\$$
 $$P(\pi_a \mid y^*) = \dfrac{P(y^* \mid \pi_a) \cdot P(\pi_a)}{P(y^*)} \quad \text{Por regla de Bayes}$$
-$$P(\pi_a \mid y^*) =  \dfrac{\binom{N}{y^*} \lambda^{y^*} (1 - \lambda)^{N - y^*}}{\int \binom{N}{y^*} \lambda^{y^*} (1 - \lambda)^{N - y^*} \, d\lambda}\\$$
-$$P(\pi_a \mid y^*) = \dfrac{[\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*} (1 - 2p)}{\int B(1 - p; y^* + 1; N - y^* + 1) - B(p; y + 1; N - y^* + 1)}\\$$
-Falta cambiar el denomidar como Z y de ahi desarrollar la integral
+$$P(\pi_a \mid y^*) =  \dfrac{\binom{N}{y^*} \lambda^{y^*} (1 - \lambda)^{N - y^*}}{\int_{0}^{1} \binom{N}{y^*} \lambda^{y^*} (1 - \lambda)^{N - y^*} \, d\lambda}\\$$
+$$P(\pi_a \mid y^*) = \dfrac{[\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*}}{\int_{0}^{1} [\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*}}\\$$
+$$P(\pi_a \mid y^*) = \dfrac{[\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*} (1 - 2p)}{Z}\\$$
+$$\text{Donde Z = } \int_{0}^{1} [\pi_a p + (1 - \pi_a)(1 - p)]^{y^*} [(1 - \pi_a)p + (1 - \pi_a)(1 - p)]^{N - y^*} d(\pi_a p + (1 - \pi_a)(1 - p))$$
+$$\text{Aplicando sustitución se tiene Z = }\int_{1-p}^{p} \lambda_W^{y^*} (1 - \lambda_W)^{N-y^*} \dfrac{d\lambda_W}{2p-1} $$
+$$Z = \dfrac{1}{2p-1}[\int_{0}^{p} \lambda_W^{(y^*+1)-1} (1 - \lambda_W)^{(N-y^*+1)-1} d\lambda_W - \int_{0}^{1-p} \lambda_W^{(y^*+1)-1} (1 - \lambda_W)^{(N-y^*+1)-1} d\lambda_W]$$
+$$\text{Sabiendo que B(x, a, b) =} \int_{0}^{x} t^{a-1}(1 - t)^{b-1} dt \text{, es la función beta incompleta se tiene que:}$$
+$$Z = \dfrac{B(p,\ y^*+1,\ N-y^* +1)\ -\ B(1-p,\ y^*+1,\ N-y^* +1)}{2p-1}$$
+
+\newpage
 
 ### Visualización de Posterior
 
@@ -472,6 +479,8 @@ ggplot(datos, aes(x = p, y = posterior, color = Niveles)) +
 A partir de la simulación del método de Warner utilizando distintos valores de $p$, se observó en la Figura @ref(fig:fig4) que el comportamiento de las distribuciones a posteriori varía notablemente según el nivel de $p$ utilizado. En particular, cuando se utilizan valores extremos de $p$, como $p = 0.3$ y $p = 0.4$, las distribuciones a posteriori tiende a concentrarse en torno al verdadero valor de $\pi_a$, presentando menor variabilidad. Esto indica que, en estos casos, la información proporcionada por la muestra es más determinante para actualizar la creencia sobre el parámetro de interés.
 
 Por otro lado, para los valores de $p$ más centrales, como $p = 0.45$ o $p = 0.6$, las distribuciones resultan más dispersas, reflejando una mayor incertidumbre en la estimación de $\pi_a$. En resumen, el valor de $p$ influye directamente en la precisión de la distribución a posteriori, por lo que debía ser cuidadosamente considerado al momento de implementar este tipo de técnicas en estudios empíricos. Además de la influencia del valor de $p$, también se debe considerar el rol que juega la aleatoriedad de las muestras obtenidas.
+
+\newpage
 
 ### ¿Y si la población cambia?
 
@@ -600,25 +609,25 @@ for (j in pi_pos) {
 }
 ```
 
-```{r fig5,echo=FALSE, warning=FALSE, message=FALSE, fig.align = "center", fig.width = 6, fig.height = 3.8, fig.cap="Posterior segun distintas poblaciones"}
+```{r ,echo=FALSE, warning=FALSE, message=FALSE, fig.align = "center", fig.width = 6, fig.height = 3.7}
 
 # Concatenar graficos
-# Cargar si no lo hiciste
 library(gridExtra)
 
 # Primer par
 grid.arrange(graficos_post[[1]], graficos_post[[2]], nrow = 2)
-
+```
+```{r fig5,echo=FALSE, warning=FALSE, message=FALSE, fig.align = "center", fig.width = 6, fig.height = 3.7, fig.cap="Posterior segun distintas poblaciones"}
 # Segundo par
 grid.arrange(graficos_post[[3]], graficos_post[[4]], nrow = 2)
-
 ```
-
 A pesar de que las poblaciones son distintas, se puede ver como para la mayoria de graficos en general el comportamiento más variable es cuando $p = 0.45$ lo cual nos ayuda a entender que si el $p$ es cercano a 0.5 menos información de la realidad nos puede aportar cada muestra aumentando la variabilidad de la incertidumbre para el parámetro de interés $\pi_a$
 
 A medida que aumenta la cantidad de estudaintes que apuestan en la poblacion se observa que para los diferentes $p$ la variabilidad gira en torno al verdadero valor de $\pi_a$ para los casos más extremos, $p = 0.3$ y $p = 0.8$. Mientras que para los casos de $p = 0.45$ y $p = 0.6$ se nota una mayor variabilidad entre las poblaciones como son muy variables no podemos obtener una buena precisión al verdadero valor.
 
 Cuando el valor de $p$ es más cercano a 0.5 el método Warner presenta una gran incertidumbre respecto a cuál es la pregunta  realizada a cada persona, lo que dificulta el discernimiento de quiénes realmente participan de la actividad sensible. En cambio cuando el valor de p se aleja de 0.5, en particular hacia los extremos, esta ambigüedad en las respuestas disminuye, lo que otorga una mayor claridad a la hora de interpretar los resultados respecto a  la proporción de personas que realizan apuestas online. 
+
+### Recursos para proximos análisis
 
 Se consideró la opción de realizar una función que permita extender los resultados del análisis realizado. De modo de poder replicar este estudio y sus inferencias de forma aproximada, pudiendo considerar un prior con una distribución diferente a la beta(1,1).
 
@@ -715,6 +724,8 @@ pertenece a la categoría sensible. Para ello, se propone utilizar una
 distribución Beta como distribución a priori, la cual ofrece
 flexibilidad al modelar distintos niveles de conocimiento o supuestos
 previos sobre la proporción de interés.
+
+### Recursos para proximos análisis
 
 A continuación, se implementa una función en R que permite realizar esta
 inferencia de manera aproximada, utilizando simulación. La función
