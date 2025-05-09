@@ -65,27 +65,11 @@ Estudiaremos dos técnicas de respuesta aleatorizada y nos centraremos en el pro
 
 1.[**El efecto de la mentira en las estimaciones**](#Objetivo-1)
 
-- [*Modelo bayesiano Beta-Binomial*](#subtitulo-1)
-- [*Niveles de mentira de los estudiantes*](#subtitulo-2)
-- [*Aumento de la cantidad de simulaciones*](#subtitulo-3)
-
 2.[**Método de Warner**](#Objetivo-2)
-
-- [*Respuesta del estudiante*](#subtitulo-4)
-- [*Modelo razonable*](#subtitulo-5)
-- [*Planteo a partir de un Prior con distribución Uniforme*](#subtitulo-6)
-- [*Visualización de Posterior*](#subtitulo-7)
-- [*¿Y si la población cambia?*](#subtitulo-8)
-- [*Recursos para proximos análisis*](#subtitulo-9)
 
 3.[**Método de Greenberg**](#Objetivo-3)
 
-- [*Probabilidad de respuesta afirmativa segun el método Greenberg*](#subtitulo-10)
-- [*Recursos para proximos análisis*](#subtitulo-11)
-
 4.[**Comparación entre los métodos y los niveles de mentira**](#Objetivo-4)
-
-- [*Aumentando la cantidad de simulaciones*](#subtitulo-12)
 
 \newpage
 
