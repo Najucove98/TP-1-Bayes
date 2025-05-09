@@ -763,7 +763,7 @@ comparaciones para 3 niveles de mentira de los estudiantes y cada método
 de aleatorización Warner y Greenberg, donde estos métodos de respuesta
 aleatoria tienen una probabilidad de pregunta de $p = 0.3$
 
-```{r,echo=FALSE, fig.align = "center", warning=FALSE, fig.width = 7, fig.height = 3.2}
+```{r fig6,echo=FALSE, fig.align = "center", warning=FALSE, fig.width = 7, fig.height = 3.2, fig.cap="Posterior para los niveles de μ"}
 set.seed(1998)
 
 #Muestra base para los 6 procedimientos
@@ -783,10 +783,10 @@ post_mu <- muestra_mu(c(0, 0.3, 0.45, 0.8), 1, 1, apuesta_b)
   ggplot(datos, aes(x = p, y = posterior, color = Mentira)) +
     geom_line() +
     geom_area(aes(fill = Mentira), alpha = 0.4, position = "identity") +
-    ggtitle("Posterior para los niveles de μ") +
     scale_color_manual(values = colores) +
     scale_fill_manual(values = colores) +
     labs(x = expression(pi), y = expression("p(" ~ pi ~ "| y)")) +
+    geom_vline(xintercept = 0.4, linetype = "dashed", color = "red", size = 0.5) +
     theme_bw() +
     theme(
       panel.grid.major = element_blank(),
@@ -795,31 +795,8 @@ post_mu <- muestra_mu(c(0, 0.3, 0.45, 0.8), 1, 1, apuesta_b)
 
 ```
 
-```{r,echo=FALSE, fig.align = "center", fig.width = 9, fig.height = 3.5, warning=FALSE}
+```{r,echo=FALSE, fig.align = "center", fig.width = 6.5, fig.height = 4, warning=FALSE}
 set.seed(2198)
-#método warner
-#Guardo la lista que devuelve la función para poder graficar
-posterior_w <- muestra_war(0.3, apuesta_b)
-
-  datos_warner <- data.frame(
-    p = rep(pi_grid, times = length(posterior_w)),
-    posterior = c(posterior_w[[1]]),
-    Mentira = rep(c("p=0.3"), each = 200))
-  
-  # Crear el grafico con ggplot2 con los siguientes mapeos
-  post_w <- ggplot(datos_warner, aes(x = p, y = posterior, color = Mentira)) +
-    geom_line() +
-    geom_area(aes(fill = Mentira), alpha = 0.4, position = "identity") +
-    ggtitle("Posterior Warner") +
-    scale_color_manual(values = "#E76F51") +
-    scale_fill_manual(values = "#E76F51") +
-    labs(x = expression(pi), y = expression("p(" ~ pi ~ "| y)")) +
-    theme_bw() +
-    theme(
-      panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank(),
-    )
-
 #método Greenberg
 #Definimos una función para evaluar distintos caso de p con un prior uniforme
 muestra_green <- function(p, apuesta_b){
@@ -866,27 +843,30 @@ muestra_green <- function(p, apuesta_b){
 #Guardo la lista que devuelve la función para poder graficar
 posterior_g <- muestra_green(0.3, apuesta_b)
 
-  datos_green <- data.frame(
-    p = rep(pi_grid, times = length(posterior_g)),
-    posterior = c(posterior_g[[1]]),
-    Mentira = rep(c("p=0.3"), each = 200))
-  
-  # Crear el grafico con ggplot2 con los siguientes mapeos
-  post_g <-ggplot(datos_green, aes(x = p, y = posterior, color = Mentira)) +
+
+#Guardo la lista que devuelve la función para poder graficar
+datos_warner_green <- data.frame(
+    p = rep(pi_grid, times = 2),
+    posterior = c(posterior_w[[1]], posterior_g[[1]]),
+    Metodo = rep(c("Warner", "Greenberg"), each = 200))
+
+# Crear el grafico con ggplot2 con los siguientes mapeos
+post_w <- ggplot(datos_warner_green, aes(x = p, y = posterior, color = Metodo)) +
     geom_line() +
-    geom_area(aes(fill = Mentira), alpha = 0.4, position = "identity") +
-    ggtitle("Posterior Greenberg") +
-    scale_color_manual(values = "#287271") +
-    scale_fill_manual(values = "#287271") +
+    geom_area(aes(fill = Metodo), alpha = 0.5, position = "identity") +
+    scale_color_manual(values = c("#FBB4AE","#B3CDE3")) + # c("#D95F02", "#1B9E77")
+    scale_fill_manual(values = c("#FBB4AE","#B3CDE3")) + # 
     labs(x = expression(pi), y = expression("p(" ~ pi ~ "| y)")) +
+    geom_vline(xintercept = 0.4, linetype = "dashed", color = "red", size = 0.5) +
     theme_bw() +
     theme(
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
     )
-  
+```
+```{r fig7,echo=FALSE, fig.align = "center", fig.width = 6.5, fig.height = 4, warning=FALSE, fig.cap="Posterior Greenberg y Warner"}
 # Concatenar graficos
-post_w | post_g
+post_w 
 ```
 
 Para una única muestra proveniente de una población con $\pi = 0.4$, se
