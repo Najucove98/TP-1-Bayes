@@ -69,7 +69,7 @@ Estudiaremos dos técnicas de respuesta aleatorizada y nos centraremos en el pro
 
 3.[**Método de Greenberg**](#Objetivo-3)
 
-4.[**Conclusiones finales sobre los métodos de respuesta aleatorizada**](#Objetivo-4)
+4.[**Comparación entre los métodos y los niveles de mentira**](#Objetivo-4)
 
 \newpage
 
@@ -175,7 +175,7 @@ plt_likelihood <- data.frame(x = pi_grid, y = likelihood) |>
 ```
 
 #### Posterior:
-La distribución a $posteriori$ representa nuestro conocimiento actualizado sobre un parámetro después de haber observado los datos. Se obtiene como el producto entre el $prior$ (lo que se creía antes) y el $likelihood$ (la verosimilitud de los datos).
+La distribución a posteriori representa nuestro conocimiento actualizado sobre un parámetro después de haber observado los datos. Se obtiene como el producto entre el $prior$ (lo que se creía antes) y el $likelihood$ (la verosimilitud de los datos).
 $$ p(\pi_a/y) \propto p(y/\pi_a).p(\pi_a) $$
 
 ```{r, echo=FALSE}
@@ -756,12 +756,9 @@ posterior_green <- function(pi, p, a, b, pi_b = 7/12){
 ```{=latex}
 \clearpage
 ```
-## Conclusiones finales de todos los métodos {#Objetivo-4}
+## Comparación entre los métodos y los niveles de mentira {#Objetivo-4}
 
-Finalizando todos los análisis planteados anteriormente se haran
-comparaciones para 3 niveles de mentira de los estudiantes y cada método
-de aleatorización Warner y Greenberg, donde estos métodos de respuesta
-aleatoria tienen una probabilidad de pregunta de $p = 0.3$
+Se finalizó el análisis planteado anteriormente haciendo comparaciones entre diferentes niveles de mentira y cada técnica de respuesta aleatorizada utilizada (Warner y Greenberg) mostrado en las siguientes figuras. 
 
 ```{r fig6,echo=FALSE, fig.align = "center", warning=FALSE, fig.width = 7, fig.height = 3.2, fig.cap="Posterior para los niveles de μ"}
 set.seed(1998)
@@ -854,8 +851,8 @@ datos_warner_green <- data.frame(
 post_w <- ggplot(datos_warner_green, aes(x = p, y = posterior, color = Metodo)) +
     geom_line() +
     geom_area(aes(fill = Metodo), alpha = 0.5, position = "identity") +
-    scale_color_manual(values = c("#FBB4AE","#B3CDE3")) + # c("#D95F02", "#1B9E77")
-    scale_fill_manual(values = c("#FBB4AE","#B3CDE3")) + # 
+    scale_color_manual(values = c("#287271","#E76F51")) + # c("#D95F02", "#1B9E77")
+    scale_fill_manual(values = c("#287271","#E76F51")) + # 
     labs(x = expression(pi), y = expression("p(" ~ pi ~ "| y)")) +
     geom_vline(xintercept = 0.4, linetype = "dashed", color = "red", size = 0.5) +
     theme_bw() +
@@ -864,42 +861,18 @@ post_w <- ggplot(datos_warner_green, aes(x = p, y = posterior, color = Metodo)) 
       panel.grid.minor = element_blank(),
     )
 ```
-```{r fig7,echo=FALSE, fig.align = "center", fig.width = 6.5, fig.height = 4, warning=FALSE, fig.cap="Posterior Greenberg y Warner"}
+```{r fig7,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 3.5, warning=FALSE, fig.cap="Posterior Greenberg y Warner"}
 # Concatenar graficos
 post_w 
 ```
 
-Para una única muestra proveniente de una población con $\pi = 0.4$, se
-evaluaron tres escenarios diferentes sobre la misma base muestral: en
-primer lugar, se incorporaron distintos niveles de mentira $\mu$ que
-afectan directamente las respuestas sobre la variable de interés, y en
-segundo lugar, se aplicaron los métodos de respuesta aleatorizada de
-Warner y Greenberg sobre la misma muestra. A partir del análisis, se
-observa que al aumentar los niveles de mentira, la variabilidad de las
-distribuciones a posteriori disminuye. Sin embargo, dichas
-distribuciones se encuentran sesgadas respecto al valor verdadero de
-$\pi$. En contraste, las distribuciones generadas bajo los métodos de
-Warner y Greenberg tienden a centrarse en el valor verdadero de $\pi$,
-lo que indicaría una estimación más precisa.
-
-Cabe destacar que, aunque ambos métodos muestran resultados
-consistentes, el método de Greenberg presenta una variabilidad
-ligeramente mayor en comparación con el de Warner. Esta diferencia
-podría atribuirse a la formulación del mecanismo de respuesta: en el
-método de Greenberg se utiliza una pregunta no relacionada con la
-variable de interés, mientras que en el método de Warner se formula una
-negación de la pregunta original, lo cual podría reducir la dispersión
-en las respuestas.
+Para una única muestra proveniente de una población con $\pi_a=0.4$, se compararon diferentes situaciones, los niveles de mentira $\mu=0$, $\mu=0.3$, $\mu=0.45$, $\mu=0.8$ y los métodos de respuesta aleatorizada Warner y Greenberg; siendo en total seis comparaciones diferentes. A partir del análisis, se observó en la Figura @ref(fig:fig6) que al aumentar los niveles de mentira, la variabilidad de las distribuciones a posteriori disminuye. Sin embargo, dichas distribuciones se encuentran sesgadas respecto al valor verdadero de $\pi_a$. Respecto a los métodos Warner y Greenberg, sus $posterior$ según la muestra utilizada tienden a centrarse en el valor verdadero de $\pi_a$, lo que indicaría una estimación más precisa. Cabe destacar que, aunque ambos métodos muestran resultados consistentes, el método de Greenberg presenta una variabilidad ligeramente mayor en comparación con el de Warner, lo que puede observarse en la Figura @ref(fig:fig7). Esta diferencia podría atribuirse a la formulación del mecanismo de respuesta: en el método de Greenberg se utiliza una pregunta no relacionada con la  variable de interés, mientras que en el método de Warner se formula una negación de la pregunta original, lo cual podría reducir la dispersión en las respuestas.
 
 ### Aumentando la cantidad de simulaciones
 
-Dado que el análisis se basa en una única simulación, no es posible
-obtener conclusiones precisas respecto al comportamiento de la variable
-en estudio. Por ello, resulta necesario aumentar la cantidad de
-simulaciones con el fin de evaluar mejor cómo la variabilidad influye
-sobre las estimaciones del parámetro de interés.
+Dado que el análisis se basa en una única simulación, no es posible obtener conclusiones respecto a las distribuciones a posteriori, por lo que resulta necesario aumentar la cantidad de simulaciones con el fin de mejorar la evaluación de los posterior para cada situación.
 
-```{r,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 4, warning=FALSE}
+```{r fig8,echo=FALSE, fig.align = "center", fig.width = 5, fig.height = 4, warning=FALSE, fig.cap="Comparación entre los distintos métodos"}
 set.seed(1998)
 
 #Muestra base para los 6 procedimientos con mil simulaciones
@@ -975,7 +948,6 @@ ggplot(resultados, aes(x = Método, y = Cobertura)) +
   geom_col(fill = c("#f08533", "#3b78b0", "#d1352c" , "#44A699","#E76F51", "#287271"), alpha = 0.65) +
   geom_text(aes(label = round(Cobertura, 3)), vjust = -0.5, size = 4) +
   labs(
-    title = expression("Comparación entre los distintos métodos "),
     subtitle = "Cobertura de intervalos del 90%",
     x = "Método",
     y = "Cobertura"
@@ -988,23 +960,11 @@ ggplot(resultados, aes(x = Método, y = Cobertura)) +
   )
 ```
 
-Como se observa en el gráfico, a medida que el nivel de mentira aumenta,
-la proporción de intervalos de credibilidad del 90% que incluyen al
-verdadero valor de $\pi$ disminuye de manera considerable. Este fenómeno
-se evidencia con claridad al comparar el escenario sin mentira, donde la
-cobertura alcanza aproximadamente un 88.8%, con el caso en que el nivel
-de mentira es $\mu = 0.3$, en el cual la cobertura desciende a 17.4%.
-Estos resultados permiten concluir, de manera empírica, que considerar
-el nivel de mentira como parte del modelo resulta fundamental para
-lograr estimaciones más precisas del valor verdadero de $\pi$.
+Como se observa en la Figura @ref(fig:fig8), a medida que el nivel de mentira aumenta, la proporción de intervalos de credibilidad del 90% que incluye al verdadero valor de $\pi_a$ disminuye de manera considerable. Este fenómeno se evidencia con claridad al comparar el escenario sin mentira, donde la cobertura alcanza aproximadamente un 88.8%, además en el caso en que el nivel de mentira es $\mu=0.3$, la cobertura desciende a 17.4%. Estos resultados permiten concluir, de manera empírica, que considerar el nivel de mentira como parte del modelo resulta fundamental para lograr estimaciones más precisas del valor verdadero de $\pi_a$.
+Por otro lado, se destaca que los métodos de Warner y Greenberg presentan proporciones de cobertura similares, en contraposición a la cobertura observada en la población donde no se miente. Este comportamiento podría atribuirse al supuesto fuerte adoptado en el análisis, según el cual los estudiantes no mienten cuando responden bajo estos métodos.
+En resumen, no se observa una gran diferencia entre los métodos considerados, pero sí se observan variaciones importantes en la cobertura según los distintos valores asumidos para el nivel de mentira $\mu$.
 
-Por otro lado, se destaca que los métodos de Warner y Greenberg
-presentan proporciónes de cobertura similares, e incluso superiores, a
-las observadas en la población donde no se miente. Este comportamiento
-podría atribuirse al supuesto fuerte adoptado en el análisis, según el
-cual los estudiantes no mienten cuando responden bajo estos métodos.
+El análisis se centró en la problemática de estudiar la proporción de estudiantes que participan en apuestas en línea, un tema de gran sensibilidad donde la honestidad de las respuestas puede verse comprometida. Se exploraron dos métodos de respuesta aleatorizada, Warner y Greenberg, como estrategias para disminuir el sesgo introducido por la deshonestidad de los estudiantes encuestados. Los resultados obtenidos revelaron que, si bien ambos métodos proporcionan estimaciones más precisas en comparación con los enfoques directos,  estos presentan diferencias sutiles en su comportamiento.Específicamente, se observó que el método de Warner tiende a generar distribuciones a posteriori con menor variabilidad, lo que sugiere una incertidumbre menor sobre el estudio del parámetro de interés. 
+Por otro lado, el análisis de la influencia de los niveles de mentira en las respuestas de los estudiantes demostró que la omisión de este factor en el modelo puede conducir a estimaciones sesgadas y poco confiables. En particular, se evidenció una disminución en la cobertura de los intervalos de credibilidad a medida que aumentaba la probabilidad de que los estudiantes mintieran. En conclusión, este trabajo subraya la importancia de emplear métodos de respuesta aleatorizada al abordar temas sensibles como las apuestas en línea entre adolescentes, y resalta la necesidad de considerar cuidadosamente el efecto que puede tener la cantidad de estudiantes que mienten sobre inferencias.
 
-En resumen, no se evidencian diferencias significativas entre los
-métodos considerados, pero sí se observan variaciones importantes en la
-cobertura según los distintos valores asumidos para el nivel de mentira
-$\mu$.
+
